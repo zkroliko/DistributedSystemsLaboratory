@@ -55,7 +55,7 @@ public class Server extends Thread
             catch (IOException e)
             {
                 System.err.println("Could not close port: " + PORT);
-                System.exit(1);
+                e.printStackTrace();
             }
         }
     }
@@ -79,19 +79,19 @@ public class Server extends Thread
 
             String inputLine;
 
-            while ((inputLine = in.readLine()) != null)
+            if ((inputLine = in.readLine()) != null)
             {
                 System.out.println ("Received: " + inputLine);
 
                 long index = Long.parseLong(inputLine);
 
-                String response = String.valueOf(generator.getDecimalDigit(index));
+                byte response = (byte) generator.getDecimalDigit(index);
 
-                System.out.println(String.format("Responding with %d decimal of pi : %s ", index, response));
+                System.out.println(String.format("Responding with %d decimal of pi : %s ", index, String.valueOf(response)));
 
                 System.out.flush();
 
-                out.write(response);
+                out.write(String.valueOf(response));
             }
 
             out.close();
@@ -100,8 +100,7 @@ public class Server extends Thread
         }
         catch (IOException e)
         {
-            System.err.println("Problem with Communication Server");
-            System.exit(1);
+            e.printStackTrace();
         }
     }
 }
