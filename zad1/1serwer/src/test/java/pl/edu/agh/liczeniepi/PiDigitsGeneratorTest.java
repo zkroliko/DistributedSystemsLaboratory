@@ -3,7 +3,17 @@ package pl.edu.agh.liczeniepi;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.swing.*;
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.Buffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,18 +42,40 @@ public class PiDigitsGeneratorTest {
 
     @Test
     public void testFor1000Individual() {
-        for (int i = 1; i < realDecimals.length(); i++) {
-            PiDigitsGenerator generator = new PiDigitsGenerator();
-            try {
-                String real = String.valueOf(realDecimals.charAt(i - 1));
-                String testing = String.valueOf(generator.getDecimalDigit(i));
+        testIndividually(realDecimals);
+    }
 
-                System.out.println(String.valueOf(real + '-' + testing));
-                assertEquals(real, testing);
+    @Test
+    public void testFor100000Individual() {
+        try {
+            URL url = getClass().getClassLoader().getResource("100000pi.txt");
+            String pi = new String(Files.readAllBytes(Paths.get(url.toURI())));
+            testIndividually(pi);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void testIndividually(String real) {
+
+        PiDigitsGenerator generator = new PiDigitsGenerator();
+
+        for (int i = 1; i < real.length(); i++) {
+
+            try {
+                char realChar = real.charAt(i - 1);
+                char testingChar = generator.getDecimalDigit(i);
+
+                System.out.println(i);
+                assertEquals(realChar, testingChar);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
+
     }
 
 }
