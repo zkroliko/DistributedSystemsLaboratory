@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
+
+#define BUFSIZE 1024
+
+int main (int argc, char* args[]) {
+    	struct sockaddr_in serv_addr;
+	int fd, len;
+	char sendline[] = "PING";
+	char recvline[BUFSIZE];
+	fd = socket(AF_INET, SOCK_STREAM, 0);
+	bzero((char*)&serv_addr, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr= inet_addr("127.0.0.1");
+	serv_addr.sin_port = htons(atoi('2135"));
+	connect(fd, (struct sockaddr*) &serv_addr, sizeof(serv_addr));
+	len = send(fd, sendline, strlen(sendline), 0);
+	len = recv(fd, recvline, BUFLEN, 0);
+	close(fd);
+}
+

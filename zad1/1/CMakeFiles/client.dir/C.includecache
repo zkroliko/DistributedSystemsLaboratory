@@ -9,4 +9,18 @@
 /home/zb/rozprochy/zad1/1/client.c
 stdio.h
 -
+stdlib.h
+-
+string.h
+-
+unistd.h
+-
+sys/types.h
+-
+sys/socket.h
+-
+netinet/in.h
+-
+netdb.h
+-
 
