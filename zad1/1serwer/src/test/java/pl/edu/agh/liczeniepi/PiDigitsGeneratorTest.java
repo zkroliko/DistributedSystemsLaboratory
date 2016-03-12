@@ -1,10 +1,13 @@
 package pl.edu.agh.liczeniepi;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-public class PiConstantTest {
+public class PiDigitsGeneratorTest {
 
     public static final String realDecimals = "314159265358979323846264338327950288419716939937510"+
             "58209749445923078164062862089986280348253421170679"+
@@ -30,25 +33,17 @@ public class PiConstantTest {
     @Test
     public void testFor1000Individual() {
         for (int i = 1; i < realDecimals.length(); i++) {
-            String real = String.valueOf(realDecimals.charAt(i-1));
-            String testing = String.valueOf(PiConstant.getDecimalDigit(i));
-            System.out.println(String.valueOf(real + '-' + testing));
-            assertEquals(real, testing);
+            PiDigitsGenerator generator = new PiDigitsGenerator();
+            try {
+                String real = String.valueOf(realDecimals.charAt(i - 1));
+                String testing = String.valueOf(generator.getDecimalDigit(i));
+
+                System.out.println(String.valueOf(real + '-' + testing));
+                assertEquals(real, testing);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-    }
-
-    @Test
-    public void testFor1000Full() {
-        String testedDecimals = "";
-
-        for (int i = 1; i < realDecimals.length(); i++) {
-            char addition = PiConstant.getDecimalDigit(i);
-            System.out.print(addition);
-            testedDecimals += addition;
-        }
-
-        System.out.println(testedDecimals);
-        assertEquals(realDecimals,testedDecimals);
     }
 
 }
