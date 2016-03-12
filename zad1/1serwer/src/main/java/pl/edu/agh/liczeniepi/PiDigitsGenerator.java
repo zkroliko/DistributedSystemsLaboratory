@@ -59,7 +59,7 @@ public class PiDigitsGenerator {
                 out.reset();
                 number = representWithoutDot(number);
 
-                System.out.print(number);
+//                System.out.print(number);
 
                 PiBuffer.set(number);
 
