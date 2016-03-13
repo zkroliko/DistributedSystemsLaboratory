@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9df83da1-d106-4402-a5e7-9c4c817504f9" name="Default" comment="Server development">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/ByteUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/pl/edu/agh/liczeniepi/Server.class" afterPath="$PROJECT_DIR$/target/classes/pl/edu/agh/liczeniepi/Server.class" />
+    <list default="true" id="9df83da1-d106-4402-a5e7-9c4c817504f9" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/pl/edu/agh/liczeniepi/ByteUtilsTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/Server.java" afterPath="$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/Server.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/ByteUtils.java" afterPath="$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/ByteUtils.java" />
     </list>
     <ignored path="1serwer.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -45,33 +44,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ByteUtils.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ByteUtils.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/ByteUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.41996557">
-              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Assert.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/org/junit/Assert.class">
+      <file leaf-file-name="ByteUtilsTest.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/pl/edu/agh/liczeniepi/ByteUtilsTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="226" column="0" selection-start-line="226" selection-start-column="0" selection-end-line="226" selection-end-column="0" />
-              <folding>
-                <element signature="e#8253#8254#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Pi.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/samples.jar!/org/apfloat/samples/Pi.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="53" column="0" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.42635658">
+              <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -82,8 +69,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JUnit4 Test Class" />
         <option value="Class" />
+        <option value="JUnit4 Test Class" />
       </list>
     </option>
   </component>
@@ -111,6 +98,7 @@
         <option value="$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/PiDigitsGenerator.java" />
         <option value="$PROJECT_DIR$/src/main/java/ByteUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/Server.java" />
+        <option value="$PROJECT_DIR$/src/test/java/pl/edu/agh/liczeniepi/ByteUtilsTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/ByteUtils.java" />
       </list>
     </option>
@@ -309,7 +297,7 @@
       <recent name="E:\Kod\sysrozproszone\zad1\1serwer\src\main\resources" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="JUnit.ByteUtilsTest">
     <configuration default="false" name="Main" type="Application" factoryName="Application" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="pl.edu.agh.liczeniepi.Server" />
@@ -393,6 +381,32 @@
       <option name="MAIN_CLASS_NAME" value="pl.edu.agh.liczeniepi.PiDigitsGeneratorTest" />
       <option name="METHOD_NAME" value="testFor100000Individual" />
       <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="false" name="ByteUtilsTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="pl.edu.agh.liczeniepi.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="1serwer" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="pl.edu.agh.liczeniepi" />
+      <option name="MAIN_CLASS_NAME" value="pl.edu.agh.liczeniepi.ByteUtilsTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" />
@@ -872,19 +886,20 @@
       <envs />
       <method />
     </configuration>
-    <list size="4">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Application.Main" />
       <item index="1" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest" />
       <item index="2" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest.testFor1000Individual" />
       <item index="3" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest.testFor100000Individual" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.ByteUtilsTest" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Application.Main" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest.testFor1000Individual" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest.testFor100000Individual" />
-        <item index="4" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.ByteUtilsTest" />
+        <item index="1" class="java.lang.String" itemvalue="Application.Main" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest.testFor1000Individual" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.PiDigitsGeneratorTest.testFor100000Individual" />
       </list>
     </recent_temporary>
   </component>
@@ -905,7 +920,7 @@
       <updated>1457531444172</updated>
       <workItem from="1457531445336" duration="5332000" />
       <workItem from="1457783472836" duration="17635000" />
-      <workItem from="1457811669350" duration="8983000" />
+      <workItem from="1457811669350" duration="10418000" />
     </task>
     <task id="LOCAL-00001" summary="Server development">
       <created>1457811826432</created>
@@ -913,43 +928,49 @@
       <option name="project" value="LOCAL" />
       <updated>1457811826432</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Server development">
+      <created>1457827818597</created>
+      <option name="number" value="00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1457827818597</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 16h 14m 25s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 28m 43s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 16h 15m 34s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 29m 54s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 16h 17m 58s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 30m 02s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 16h 18m 27s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 32m 29s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 16h 19m 25s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 33m 13s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 16h 19m 52s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 34m 39s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 16h 20m 16s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 34m 50s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 16h 20m 52s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 35m 15s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest - 2016.03.12 at 17h 19m 23s.xml">
-      <configuration name="PiDigitsGeneratorTest" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 35m 26s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="PiDigitsGeneratorTest_testFor1000Individual - 2016.03.12 at 17h 19m 45s.xml">
-      <configuration name="PiDigitsGeneratorTest.testFor1000Individual" configurationId="JUnit" />
+    <history-entry file="ByteUtilsTest - 2016.03.13 at 01h 35m 40s.xml">
+      <configuration name="ByteUtilsTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31950000" />
+    <option name="totallyTimeSpent" value="33385000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -958,7 +979,7 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="SBT Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32896176" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32896176" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33114755" sideWeight="0.08098224" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.631524" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -973,7 +994,7 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Key Promoter" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1002,13 +1023,13 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/ByteUtils.java</url>
-          <line>19</line>
+          <url>file://$PROJECT_DIR$/src/test/java/pl/edu/agh/liczeniepi/ByteUtilsTest.java</url>
+          <line>11</line>
           <properties />
-          <option name="timeStamp" value="12" />
+          <option name="timeStamp" value="17" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="14" />
+      <option name="time" value="18" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1120,20 +1141,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/org/junit/runners/ParentRunner.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33195022">
-          <caret line="240" column="0" selection-start-line="240" selection-start-column="0" selection-end-line="240" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6390042">
-          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_65/src.zip!/java/lang/String.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5613126">
@@ -1146,14 +1153,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="1" selection-start-line="0" selection-start-column="1" selection-end-line="0" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/samples.jar!/org/apfloat/samples/Pi.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="53" column="0" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1215,6 +1214,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_65/src.zip!/java/nio/HeapByteBuffer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="411" column="0" selection-start-line="411" selection-start-column="0" selection-end-line="411" selection-end-column="0" />
+          <folding>
+            <element signature="e#9361#9362#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/Server.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1226,10 +1235,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/org/junit/internal/runners/model/EachTestNotifier.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.8672199">
+          <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/org/junit/runners/ParentRunner.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.76763487">
+          <caret line="203" column="0" selection-start-line="203" selection-start-column="0" selection-end-line="203" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/org/junit/internal/runners/model/ReflectiveCallable.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6390042">
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/samples.jar!/org/apfloat/samples/Pi.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.045643155">
+          <caret line="53" column="0" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_65/src.zip!/java/nio/Buffer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.374031">
+          <caret line="505" column="0" selection-start-line="505" selection-start-column="0" selection-end-line="505" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pl/edu/agh/liczeniepi/ByteUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.41996557">
-          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/pl/edu/agh/liczeniepi/ByteUtilsTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.42635658">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding />
         </state>
       </provider>
