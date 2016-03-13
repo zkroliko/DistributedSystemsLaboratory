@@ -1,25 +1,24 @@
 package pl.edu.agh.liczeniepi;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.text.NumberFormat;
 
 public class ByteUtils {
     private static ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
 
     public static final byte SEPARATOR = 10;
 
-    public static byte[] longToBytes(long x) {
-        buffer.putLong(0, x);
-        return buffer.array();
-    }
-
-    public static long bytesToLong(byte[] bytes) {
+    public synchronized static long bytesToLong(byte[] bytes) {
+        buffer.clear();
         int length = 1;
-        while(length < 9 && bytes[length] != SEPARATOR && tailEmpty(bytes,length)) {
+        while(length < 9 && bytes[length] != SEPARATOR && !tailEmpty(bytes,length)) {
             length++;
         }
-        byte [] fixedBytes = copyAndFillBytes(bytes,length);
+        byte [] fixedBytes = removeSeparator(bytes,length);
         buffer.put(fixedBytes, 0, fixedBytes.length);
         buffer.flip();//need flip
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
         return buffer.getLong();
     }
 
@@ -32,14 +31,10 @@ public class ByteUtils {
         return true;
     }
 
-    private static byte[] copyAndFillBytes(byte[] bytes, int length) {
+    private static byte[] removeSeparator(byte[] bytes, int length) {
         byte[] copyBytes = new byte[8];
-        int first = 0, second=bytes.length-1-length;
-        // Zipping
-        while (first < length) {
-            copyBytes[second] = bytes[first];
-            first++;
-            second++;
+        for (int i = 0 ; i < length; i++) {
+            copyBytes[i] = bytes[i];
         }
         return copyBytes;
     }

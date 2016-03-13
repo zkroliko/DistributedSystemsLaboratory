@@ -9,7 +9,7 @@ public class Server extends Thread
     private static boolean serverContinue = true;
     private Socket clientSocket;
 
-    public static final long MAX_INDEX = 1000000;
+    public static final long MAX_INDEX = 5000000;
 
     private PiDigitsGenerator generator;
 
@@ -27,14 +27,14 @@ public class Server extends Thread
             try {
                 while (serverContinue)
                 {
-                    serverSocket.setSoTimeout(TIMEOUT);
+                    serverSocket.setSoTimeout(TIMEOUT*100);
                     System.out.println ("Waiting for Connection");
                     try {
                         new Server(serverSocket.accept());
                     }
                     catch (SocketTimeoutException ste)
                     {
-                        System.out.println ("Timeout Occurred");
+                        System.out.println ("Main thread timeout Occurred");
                     }
                 }
             }
@@ -72,7 +72,7 @@ public class Server extends Thread
 
     public void run()
     {
-        System.out.println ("New Communication Thread Started");
+        System.out.println ("New Communication Thread Started with: " + clientSocket.getInetAddress());
 
         try {
             OutputStream out = clientSocket.getOutputStream();
@@ -86,26 +86,43 @@ public class Server extends Thread
 
                 System.out.println ("Received: " + index);
 
-                if (index < MAX_INDEX) {
+                byte response;
 
-                    byte response = (byte) generator.getDecimalDigit(index);
+                if (index <= MAX_INDEX) {
+                    if (index > 0) {
+                      response = (byte) generator.getDecimalDigit(index);
 
-                    System.out.println(String.format("Responding with %d decimal of pi : %s ", index, String.valueOf(response)));
+                      System.out.println(String.format("Responding with %d decimal of pi : %s ", index, (char)response));
 
-                    System.out.flush();
-
-                    out.write(response);
+                    } else {
+                        response = '-';
+                        System.out.println("Responding with - to signal bad argument");
+                    }
+                } else {
+                    response='?';
+                    System.out.println("Responding with ? to signal that the index requested is too big");
                 }
+
+                out.write(response);
 
             }
 
             out.close();
             in.close();
             clientSocket.close();
+
+
+            System.out.println("Thread " + this.getId() + " shutting down");
+
+            this.join();
         }
         catch (IOException e)
         {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+
         }
     }
 
