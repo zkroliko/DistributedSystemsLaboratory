@@ -10,24 +10,29 @@ class ChatReceiver
   end
 
   def start
-    @serverActive = true
-    addr = [@ip, @port]
+    Thread.start() do
 
-    @socket = UDPSocket.new
-    @socket.bind(addr[0], addr[1])
-
-    puts "\nDEBUG Receiver: Open socket to #{@ip}:#{@port}"
+      @serverActive = true
+      addr = [@ip, @port]
 
 
-    while(@serverActive) do
-      # if this number is too low it will drop the larger packets and never give them to you
-      data, addr = @socket.recvfrom(1024)
-      msg = Message.new.fromString(data)
-      puts "#{msg.nick} #{msg.time}: #{msg.text}"
+      @socket = UDPSocket.new
+      @socket.bind(addr[0], addr[1])
+
+      # puts "\nDEBUG Receiver: Open socket to #{@ip}:#{@port}"
+
+      while(@serverActive) do
+        # if this number is too low it will drop the larger packets and never give them to you
+        data, addr = @socket.recvfrom(4096)
+        msg = Message.new
+        msg.fromString(data)
+        printf "\r#{msg.nick} - #{msg.time}: #{msg.text}\n"
+        # For formatting sake
+        printf ">"
+      end
+
+      @socket.close
     end
-
-
-    @socket.close
 
   end
 end

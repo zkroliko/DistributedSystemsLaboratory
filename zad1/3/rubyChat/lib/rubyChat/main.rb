@@ -9,13 +9,11 @@ receiver = ChatReceiver.new('127.0.0.1', 5000)
 
 nick="Krokodyl"
 
-Thread.start() do
-  receiver.start
-end
+receiver.start
 
 continue = true
 
-puts("Welcome to the channel")
+puts("Welcome to the channel dear #{nick}")
 
 while(continue) do
     print(">")

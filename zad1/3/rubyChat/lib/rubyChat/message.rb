@@ -24,7 +24,7 @@ class Message
   end
 
   def toString
-    "#{@nick}\n#{@text}\n#{@time}\n#{@checksum}"
+    "#{@nick}\n#{@text}#{@time}\n#{@checksum}"
   end
 
   def fromString(text)
