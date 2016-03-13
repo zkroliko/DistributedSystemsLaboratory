@@ -2,11 +2,14 @@ package pl.edu.agh.liczeniepi;
 
 import java.net.*;
 import java.io.*;
+import java.nio.ByteBuffer;
 
 public class Server extends Thread
 {
     private static boolean serverContinue = true;
     private Socket clientSocket;
+
+    public static final long MAX_INDEX = 1000000;
 
     private PiDigitsGenerator generator;
 
@@ -72,26 +75,28 @@ public class Server extends Thread
         System.out.println ("New Communication Thread Started");
 
         try {
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),
-                    true);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader( clientSocket.getInputStream()));
+            OutputStream out = clientSocket.getOutputStream();
+            InputStream in = clientSocket.getInputStream();
 
-            String inputLine;
+            byte[] input = new byte[9];
 
-            if ((inputLine = in.readLine()) != null)
+            if (in.read(input) > 0)
             {
-                System.out.println ("Received: " + inputLine);
+                long index = parseInput(input);
 
-                long index = Long.parseLong(inputLine);
+                System.out.println ("Received: " + index);
 
-                byte response = (byte) generator.getDecimalDigit(index);
+                if (index < MAX_INDEX) {
 
-                System.out.println(String.format("Responding with %d decimal of pi : %s ", index, String.valueOf(response)));
+                    byte response = (byte) generator.getDecimalDigit(index);
 
-                System.out.flush();
+                    System.out.println(String.format("Responding with %d decimal of pi : %s ", index, String.valueOf(response)));
 
-                out.write(String.valueOf(response));
+                    System.out.flush();
+
+                    out.write(response);
+                }
+
             }
 
             out.close();
@@ -102,5 +107,9 @@ public class Server extends Thread
         {
             e.printStackTrace();
         }
+    }
+
+    private long parseInput(byte[] bytes) {
+        return ByteUtils.bytesToLong(bytes);
     }
 }
