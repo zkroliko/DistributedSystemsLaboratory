@@ -49,7 +49,7 @@ public class PiDigitsGenerator {
                 return PiBuffer.get((int) digitNumber);
             } else {
                 try {
-                    Pi.run(digitNumber,10, new Pi.BorweinPiCalculator(digitNumber+PREC_OFFSET,10));
+                    Pi.run(digitNumber,10, new Pi.ChudnovskyPiCalculator(digitNumber+PREC_OFFSET,10));
                     outWriter.flush();
                 } catch (IOException e) {
                     e.printStackTrace();
