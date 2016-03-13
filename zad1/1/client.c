@@ -11,9 +11,13 @@
 #include <math.h>
 
 #define IN_BUFSIZE 1024
-#define REC_BUFSIZE 1
 
-#define MAX_QUERY_SIZE 8
+#define REC_BUFSIZE 2
+
+// Could do with 8 but there is memcpy problem
+// two consecutive addresses even thought they
+// are not overlapping will fail memcpy (bug?)
+#define MAX_QUERY_SIZE 9
 
 #define SEPARATOR 10
 
@@ -35,15 +39,17 @@ static int parameterCountGood(int length) {
 
 static int makeQuery(char* in, char* query) {
 	long long number;
-
      
 	/* Trying to parse the input as a number */
 
-	number = strtoll(in, &query, 10);
+
+	/* To distinguish success/failure after call */
+
 
 	errno = 0;
 
-	/* To distinguish success/failure after call */
+	number = strtoll(in, NULL, 10);
+
 
 	if (errno != 0 || number <= 0) {
 		fprintf(stderr, "Failure to parse input as postive number\n");
@@ -78,36 +84,31 @@ static int makeQuery(char* in, char* query) {
 		fprintf(stderr, "Query size of %d bytes has been selected\n", size);
 	} else {		
 		fprintf(stderr, "Unspecified error in parsing input number. Cannot find a correct size.\n");
-		return -1;
+		return -1;				
 	}        
 
-	/* Finally formatting the number to correct size */
-
-	if (size == 4) {
-		*query = (int) *query;
-	} else if (size == 2) {
-		*query = (short) *query;
-	} else {
-		*query = (char) *query;
-	}
+	/* Finally formatting(copying) the number to(of) the correct size */
+	// potential hacking !!!
+	if (memcpy(query,&number, size) < 0 ) {
+		fprintf(stderr, "Problem with placing the number in the buffer.\n");
+		return -1;
+	}		
 
 	/* Returning the size */
 
 	return size;
 }
 
-static void printNumber(FILE* file, char* num, int size) {
-
-	long long number = (long long) num;
+static void printNumber(FILE* file, char* number, int size) {
 
 	if (size == 8) {
-		fprintf(file, "%lld", (long long)number);
+		fprintf(file, "%lld", *(long long *)number);
 	} else if (size == 4) {
-		fprintf(file, "%d", (int)number);
+		fprintf(file, "%d", *(int *)number);
 	} else if (size == 2) {
-		fprintf(file, "%hd", (short)number);
+		fprintf(file, "%hd", *(short *)number);
 	} else {
-		fprintf(file, "%c", (char)number);
+		fprintf(file, "%hhd", *number);
 	}
 }
 
@@ -115,20 +116,27 @@ int main (int argc, char* args[]) {
 
    	struct sockaddr_in serv_addr;
 	int fd, len;
+
+	/* Checking the parameter size */
+
 	if (parameterCountGood(argc) < 0) {
 		fprintf(stderr, "Usage: client <postive number>\n");
         return 0;
 
 	}
+
+	/* Choosing a correct number formar(validating input) and making a query */
+
 	char query [MAX_QUERY_SIZE];
+	bzero((char*)&query, sizeof(query));
 
 	if ((querySize = (makeQuery(args[1], query))) < 1) {
-		fprintf(stderr, "Invalid number. Please enter a positive integer\n");
+		fprintf(stderr, "Invalid number. Please enter a positive integer which fits in 8 bytes.\n");
 		return -1;
 	}
 
-	
-	char recvline[REC_BUFSIZE];
+
+	/* Creating the socket */
 
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -143,6 +151,9 @@ int main (int argc, char* args[]) {
 	connect(fd, (struct sockaddr*) &serv_addr, sizeof(serv_addr));
 
     	fprintf(stderr, "Socket open\n");
+
+
+	/* Sending message */
 
     	fprintf(stderr, "Sending %d byte message: ", querySize);
 	printNumber(stderr,query, querySize);
@@ -166,20 +177,44 @@ int main (int argc, char* args[]) {
 		return -1;
 	}   
 
+
+	/* Getting a response */
+
+	
+	char recvline[REC_BUFSIZE];
+
+	bzero((char*)&recvline, sizeof(recvline));
+
     	fprintf(stderr, "Waiting for response\n");
 
-	len = recv(fd, recvline, REC_BUFSIZE, 0);
+	len = recv(fd, recvline, 1, 0);
 
 	fprintf(stderr, "Recv returned %d\n", len);
 
-	if (len != REC_BUFSIZE) {		
+	if (len != 1) {		
 		fprintf(stderr, "Recv malfunction.\n");
 		return -1;
 	}
 
-// Unsafe buffer
 
-    	fprintf(stderr,"Received %d byte message: %s.1\n", len, recvline);
+    	fprintf(stderr,"Received %d byte message: %s\n", len, recvline);
+
+
+	/* Printing the result*/
+
+	if (recvline[0] == '-') {
+		fprintf(stderr, "Not positive number sent to the server. Unexpected error.\n");
+		printf("Service unaviable. Please report the problem to development team.\n");
+		return -1;
+	} else if (recvline[0] == '?') {
+		fprintf(stderr, "Server declined the request. The number might be too big.\n");
+		printf("Request is too big. Please contact administrator in order to raise the limit.\n");
+		return -1;
+	} else {
+		printf("The "); 
+		printNumber(stdout,query, querySize);
+		printf(" decimal digit of pi is %s\n", recvline); 
+	}
 
 	close(fd);
 }

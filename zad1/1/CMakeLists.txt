@@ -8,3 +8,4 @@ link_directories(/usr/local/lib)
 
 # link the libraries to the executable
 target_link_libraries (client m)
+set(CMAKE_BUILD_TYPE Debug)
