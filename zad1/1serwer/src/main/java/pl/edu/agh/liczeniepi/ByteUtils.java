@@ -17,7 +17,8 @@ public class ByteUtils {
         while(length < 9 && bytes[length] != SEPARATOR && tailEmpty(bytes,length)) {
             length++;
         }
-        buffer.put(copyAndFillBytes(bytes,length), 0, length);
+        byte [] fixedBytes = copyAndFillBytes(bytes,length);
+        buffer.put(fixedBytes, 0, fixedBytes.length);
         buffer.flip();//need flip
         return buffer.getLong();
     }
@@ -33,7 +34,7 @@ public class ByteUtils {
 
     private static byte[] copyAndFillBytes(byte[] bytes, int length) {
         byte[] copyBytes = new byte[8];
-        int first = 0, second=bytes.length-2-length;
+        int first = 0, second=bytes.length-1-length;
         // Zipping
         while (first < length) {
             copyBytes[second] = bytes[first];
