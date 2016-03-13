@@ -21,8 +21,6 @@
 
 #define SEPARATOR 10
 
-static char separator = SEPARATOR;
-
 static int querySize;
 
 static int parameterCountGood(int length);
@@ -153,30 +151,22 @@ int main (int argc, char* args[]) {
     	fprintf(stderr, "Socket open\n");
 
 
-	/* Sending message */
+	/* Sending message and a separator */
 
     	fprintf(stderr, "Sending %d byte message: ", querySize);
 	printNumber(stderr,query, querySize);
 	fprintf(stderr, "\n");
 
-	len = send(fd, query, querySize, 0);
+	query[querySize]=SEPARATOR;
+
+	len = send(fd, query, querySize+1, 0);
 
 	fprintf(stderr, "Sent %d bytes of message\n", len);
 
-	if (len != querySize) {		
+	if (len != querySize+1) {		
 		fprintf(stderr, "Invalid number of sent bytes.\n");
 		return -1;
 	}
-
-	/* Sending a separator */
-
-	len = send(fd, &separator, 1, 0);
-
-	if (len != 1) {		
-		fprintf(stderr, "Error in sending the separator.\n");
-		return -1;
-	}   
-
 
 	/* Getting a response */
 
@@ -216,7 +206,12 @@ int main (int argc, char* args[]) {
 		printf(" decimal digit of pi is %s\n", recvline); 
 	}
 
-	close(fd);
+	int res;
+	if ((res = close(fd)) < 0) {
+		fprintf(stderr, "Closing the socket failed. Returned:%d\n", res);
+	}
+
+	return 0;
 }
 
 
