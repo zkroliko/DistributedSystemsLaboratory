@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,6 +15,12 @@ import java.util.Random;
 public class Chat implements Runnable {
 
     public static final String ELECT_CODE = "ELECT";
+
+    public static final String CONFIRM_CODE = "CONFIRM";
+
+    public static final int ELECT_MAX_TRY = 5;
+
+    public static final int ELECT_WAIT_TIME = 100;
 
     protected InetAddress group;
     protected int port;
@@ -25,6 +32,7 @@ public class Chat implements Runnable {
     protected DatagramPacket out, in;
 
     private String leaderNick;
+    private boolean leaderConfirmed;
     private boolean isLeader;
 
     byte[] outBuffer;
@@ -56,16 +64,11 @@ public class Chat implements Runnable {
                     toTransmit = ELECT_CODE;
                     msg = new Message(leaderNick, toTransmit);
                     outBuffer = msg.getByteBuffer();
-                    out.setData(outBuffer);
-                    out.setLength(outBuffer.length);
-                    socket.send(out);
-
+                    transmit();
                 } else {
                     msg = new Message(userNick, toTransmit);
                     outBuffer = msg.getByteBuffer();
-                    out.setData(outBuffer);
-                    out.setLength(outBuffer.length);
-                    socket.send(out);
+                    transmit();
                 }
 
             } catch (IOException e) {
@@ -74,6 +77,12 @@ public class Chat implements Runnable {
 
         }
 
+    }
+
+    private void transmit() throws IOException {
+        out.setData(outBuffer);
+        out.setLength(outBuffer.length);
+        socket.send(out);
     }
 
     private void makeElection() {
@@ -124,12 +133,33 @@ public class Chat implements Runnable {
                 // Checking whether this node hasn't been selected as leader
                 if (Message.checkNickname(userNick, msg)){
                     if (leaderNick != null && Message.getNickname(msg).equals(leaderNick)) {
-                        System.out.println("LEAD: \n" + Message.convertToMsg(msg));
+                        if (Message.getText(msg).equals(CONFIRM_CODE)) {
+                            // Leader confirmation
+                            leaderConfirmed = true;
+                            System.out.println("Leader confirmed: " + Message.convertToMsg(msg));
+                        } else {
+                            System.out.println("LEADER ELECTED: " + Message.convertToMsg(msg));
+                        }
                     } else {
                         System.out.println(Message.convertToMsg(msg));
                     }
+                } else {
+                    if (Message.getText(msg).equals(ELECT_CODE)) {
+                        System.out.println("You have been selected as leader: " + Message.convertToMsg(msg));
+                        confirmElected();
+                    }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void confirmElected() {
+        try {
+            Message msg = new Message(leaderNick, CONFIRM_CODE);
+            outBuffer = msg.getByteBuffer();
+            transmit();
         } catch (IOException e) {
             e.printStackTrace();
         }
