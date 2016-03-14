@@ -6,14 +6,14 @@ import java.net.DatagramPacket;
 import java.util.Calendar;
 import java.util.Date;
 
-public class ChatMessage {
+public class Message {
 
     private String nickname;
     private String text;
     private Calendar now;
     private int ctrlsum;
 
-    public ChatMessage(String nickname, String text) {
+    public Message(String nickname, String text) {
         this.nickname = nickname;
         this.text = text;
         now = Calendar.getInstance();

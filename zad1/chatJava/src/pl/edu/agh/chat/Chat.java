@@ -15,50 +15,52 @@ public class Chat implements Runnable {
 
     protected InetAddress group;
     protected int port;
-    private String myNick;
+    private String userNick;
 
     protected Thread listener;
 
-    protected MulticastSocket sck;
+    protected MulticastSocket socket;
     protected DatagramPacket out, in;
 
-    private String leaderNickname;
-    private boolean isElected;
+    private String leaderNick;
+    private boolean isLeader;
 
-    byte[] outBuf;
+    byte[] outBuffer;
 
-    private List<String> users;
+    private List<String> userList;
 
-
-    public Chat(InetAddress group, int port, String myNick) {
+    public Chat(InetAddress group, int port, String userNick) {
         this.group = group;
         this.port = port;
-        this.myNick = myNick;
-        users = new ArrayList<String>();
+        this.userNick = userNick;
+        userList = new ArrayList<String>();
     }
 
     private void chat() {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Chat started.");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Welcome "+ userNick);
 
         while (true) {
             try {
-                String toSendMsg = br.readLine();
-                ChatMessage chtMsg;
-                if (toSendMsg.equals("elect")) {
+                String toTransmit = reader.readLine();
+
+                Message msg;
+
+                if (toTransmit.equals("elect")) {
                     makeElection();
-                    toSendMsg = "E";
-                    chtMsg = new ChatMessage(leaderNickname, toSendMsg);
-                    outBuf = chtMsg.getByteBuffer();
-                    out.setData(outBuf);
-                    out.setLength(outBuf.length);
-                    sck.send(out);
+                    toTransmit = "ELECT";
+                    msg = new Message(leaderNick, toTransmit);
+                    outBuffer = msg.getByteBuffer();
+                    out.setData(outBuffer);
+                    out.setLength(outBuffer.length);
+                    socket.send(out);
+
                 } else {
-                    chtMsg = new ChatMessage(myNick, toSendMsg);
-                    outBuf = chtMsg.getByteBuffer();
-                    out.setData(outBuf);
-                    out.setLength(outBuf.length);
-                    sck.send(out);
+                    msg = new Message(userNick, toTransmit);
+                    outBuffer = msg.getByteBuffer();
+                    out.setData(outBuffer);
+                    out.setLength(outBuffer.length);
+                    socket.send(out);
                 }
 
             } catch (IOException e) {
@@ -70,16 +72,16 @@ public class Chat implements Runnable {
     }
 
     private void makeElection() {
-        Random rnd = new Random();
-        int electedInd = rnd.nextInt(users.size());
-        leaderNickname = users.get(electedInd);
+        Random rand = new Random();
+        int leaderIndex = rand.nextInt(userList.size());
+        leaderNick = userList.get(leaderIndex);
     }
 
-    public synchronized void init() throws IOException {
+    public synchronized void join() throws IOException {
         if (listener == null) {
-            sck = new MulticastSocket(port);
-            sck.setTimeToLive(5);
-            sck.joinGroup(group);
+            socket = new MulticastSocket(port);
+            socket.setTimeToLive(5);
+            socket.joinGroup(group);
 
             out = new DatagramPacket(new byte[48], 48, group, port);
             in = new DatagramPacket(new byte[48], 48);
@@ -98,20 +100,20 @@ public class Chat implements Runnable {
         try {
             while (!Thread.interrupted()) {
                 in.setLength(in.getData().length);
-                // receiving data
-                sck.receive(in);
+                // Receiving data
+                socket.receive(in);
                 String msg = new String(in.getData(), 0, in.getLength(), "UTF8");
-                if (!users.contains(ChatMessage.getNickname(msg))) users.add(ChatMessage.getNickname(msg));
-                if (ChatMessage.getText(msg).equals("E")) leaderNickname = ChatMessage.getNickname(msg);
-                if (ChatMessage.checkCRC(msg)) {
+                if (!userList.contains(Message.getNickname(msg))) userList.add(Message.getNickname(msg));
+                if (Message.getText(msg).equals("E")) leaderNick = Message.getNickname(msg);
+                if (Message.checkCRC(msg)) {
                     System.out.println("Bad checksum in the datagram.");
                     continue;
                 }
-                if (ChatMessage.checkNickname(myNick, msg)){
-                    if (leaderNickname != null && ChatMessage.getNickname(msg).equals(leaderNickname)) {
-                        System.out.println("LEAD: \n" + ChatMessage.convertToMsg(msg));
+                if (Message.checkNickname(userNick, msg)){
+                    if (leaderNick != null && Message.getNickname(msg).equals(leaderNick)) {
+                        System.out.println("LEAD: \n" + Message.convertToMsg(msg));
                     } else {
-                        System.out.println(ChatMessage.convertToMsg(msg));
+                        System.out.println(Message.convertToMsg(msg));
                     }
                 }
             }
@@ -121,18 +123,23 @@ public class Chat implements Runnable {
     }
 
     public static void main(String args[]) {
-        if (args.length != 2) {
-            throw new IllegalArgumentException("Usage: Chat <ip:port> <nickname>");
+        if (args.length != 3) {
+            throw new IllegalArgumentException("Usage: Chat <ip> <port> <nickname>");
         }
         try {
-            InetAddress group = InetAddress.getByName(args[0].split(":")[0]);
-            int port = Integer.parseInt(args[0].split(":")[1]);
-            if (args[1].length() > 6) throw new IllegalArgumentException("Username too long!");
-            String userName = args[1];
-            Chat sc = new Chat(group, port, userName);
-            sc.init();
-        } catch (UnknownHostException e) {
+            InetAddress group = InetAddress.getByName(args[0]);
+            int port = Integer.parseInt(args[1]);
 
+            String nickname = args[2];
+            if (nickname.length() > 6) {
+                System.out.println("Username to long, will continue!");
+                nickname = nickname.substring(0,5);
+            }
+
+            Chat chat = new Chat(group, port, nickname);
+            chat.join();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
