@@ -13,6 +13,8 @@ import java.util.Random;
 
 public class Chat implements Runnable {
 
+    public static final String ELECT_CODE = "ELECT";
+
     protected InetAddress group;
     protected int port;
     private String userNick;
@@ -37,6 +39,9 @@ public class Chat implements Runnable {
     }
 
     private void chat() {
+        // Adding local node to the list
+        userList.add(userNick);
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Welcome "+ userNick);
 
@@ -48,7 +53,7 @@ public class Chat implements Runnable {
 
                 if (toTransmit.equals("elect")) {
                     makeElection();
-                    toTransmit = "ELECT";
+                    toTransmit = ELECT_CODE;
                     msg = new Message(leaderNick, toTransmit);
                     outBuffer = msg.getByteBuffer();
                     out.setData(outBuffer);
@@ -73,6 +78,9 @@ public class Chat implements Runnable {
 
     private void makeElection() {
         Random rand = new Random();
+        if (userList.size() == 1) {
+            System.out.println("Not aware of any nodes except this one - will self-elect");
+        }
         int leaderIndex = rand.nextInt(userList.size());
         leaderNick = userList.get(leaderIndex);
     }
@@ -95,7 +103,6 @@ public class Chat implements Runnable {
         }
     }
 
-    @Override
     public void run() {
         try {
             while (!Thread.interrupted()) {
@@ -103,12 +110,18 @@ public class Chat implements Runnable {
                 // Receiving data
                 socket.receive(in);
                 String msg = new String(in.getData(), 0, in.getLength(), "UTF8");
-                if (!userList.contains(Message.getNickname(msg))) userList.add(Message.getNickname(msg));
-                if (Message.getText(msg).equals("E")) leaderNick = Message.getNickname(msg);
-                if (Message.checkCRC(msg)) {
+                // Checking checksum
+                if (Message.checkChecksum(msg)) {
                     System.out.println("Bad checksum in the datagram.");
                     continue;
                 }
+                // Adding to user list
+                if (!userList.contains(Message.getNickname(msg)))
+                    userList.add(Message.getNickname(msg));
+                // Receiving election
+                if (Message.getText(msg).equals(ELECT_CODE))
+                    leaderNick = Message.getNickname(msg);
+                // Checking whether this node hasn't been selected as leader
                 if (Message.checkNickname(userNick, msg)){
                     if (leaderNick != null && Message.getNickname(msg).equals(leaderNick)) {
                         System.out.println("LEAD: \n" + Message.convertToMsg(msg));
@@ -132,7 +145,7 @@ public class Chat implements Runnable {
 
             String nickname = args[2];
             if (nickname.length() > 6) {
-                System.out.println("Username to long, will continue!");
+                System.out.println("Username too long, will continue!");
                 nickname = nickname.substring(0,5);
             }
 

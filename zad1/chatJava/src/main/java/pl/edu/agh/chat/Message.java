@@ -57,7 +57,7 @@ public class Message {
         return !nick.equals(nickname);
     }
 
-    public static boolean checkCRC(String msg) {
+    public static boolean checkChecksum(String msg) {
         String nick = msg.substring(0, 5).split("-")[0];
         String txt = msg.substring(6, 25).split("-")[0];
         String time = msg.substring(26, 33).split("-")[0];
