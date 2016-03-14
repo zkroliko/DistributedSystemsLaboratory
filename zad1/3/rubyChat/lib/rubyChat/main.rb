@@ -4,10 +4,13 @@ require 'rubyChat/chat_receiver.rb'
 require 'rubyChat/chat_sender.rb'
 require 'rubyChat/message.rb'
 
-sender = ChatSender.new('127.0.0.1', 5000)
-receiver = ChatReceiver.new('127.0.0.1', 5000)
-
 nick="Krokodyl"
+
+MULTICAST_ADDR = "224.0.0.1"
+PORT = 5000
+
+sender = ChatSender.new('MULTICAST_ADDR', PORT)
+receiver = ChatReceiver.new('MULTICAST_ADDR', PORT, nick)
 
 receiver.start
 

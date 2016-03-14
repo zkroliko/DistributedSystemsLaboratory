@@ -2,34 +2,35 @@ require 'digest'
 
 class Message
 
-  attr_accessor :nick, :text, :time, :checksum
+  attr_accessor :nick, :text, :time, :checksum, :checksumValid
 
-  def initialize(nick=nil,message=nil)
+  def initialize(nick="",message="")
     @nick = nick
-    @text = message
-    @time = Time.now
+    @text = message[0..20].gsub(/\n/, "") # limiting length, no newline
+    @time = "#{Time.now.hour}:#{Time.now.min}".to_s()
     @checksum = calculateChecksum
+    @checksumValid = true
   end
 
   def calculateChecksum
-    hash = {nick: @nick, text: @text, time: @time}
-    Digest::MD5.hexdigest(Marshal::dump(hash))
+    str = "#{@nick}#{@text}#{@time}"
+    Digest::MD5.hexdigest(str)
   end
 
   def testChecksum
-    #change
-    if (calculateChecksum.equal? @checksum)
-      puts "Error in checksum"
+    if calculateChecksum == @checksum
+      @checksumValid = true
+    else
+      @checksumValid = false
     end
   end
 
   def toString
-    "#{@nick}\n#{@text}#{@time}\n#{@checksum}"
+    "#{@nick}\n#{@text}\n#{@time}\n#{@checksum}"
   end
 
   def fromString(text)
     values = String(text).split("\n")
-    # puts values
     @nick = values[0]
     @text = values[1]
     @time = values[2]

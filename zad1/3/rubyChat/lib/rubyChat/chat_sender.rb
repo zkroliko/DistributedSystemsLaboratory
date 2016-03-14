@@ -9,18 +9,18 @@ class ChatSender
 
 
   def send(message)
-    addr = [@ip, @port]
 
-    @socket = UDPSocket.new
-    @socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
+    begin
+      @socket = UDPSocket.open
 
-    # puts "Client: Open socket to #{@ip}:#{@port}"
+      #print "Client: Open socket to #{@ip}:#{@port}"
 
-    data = message
-    @socket.send(data, 0, addr[0], addr[1])
+      @socket.setsockopt(Socket::IPPROTO_IP, Socket::IP_TTL, [1].pack('i'))
+      @socket.send(message, 0, MULTICAST_ADDR, PORT)
 
-    # print "Client: Data has been sent\n"
-
-    @socket.close
+      #print "Client: Data has been sent\n"
+    ensure
+      @socket.close
+    end
   end
 end
