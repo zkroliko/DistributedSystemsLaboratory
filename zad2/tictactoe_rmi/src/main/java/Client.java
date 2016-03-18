@@ -24,7 +24,7 @@ public class Client {
                     System.out.println("Podaj skladnik y ruchu");
                     y = scanner.nextInt();
                     if (!validInput(x,y)) {
-                        System.out.println("Podane zle wspolrzedne");
+                        System.out.println("Podano zle wspolrzedne");
                     }
                 }
                 game.makeMove(self, new Coordinates(x,y));

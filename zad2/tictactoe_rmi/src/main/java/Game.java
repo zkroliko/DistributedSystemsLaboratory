@@ -15,6 +15,8 @@ public class Game implements Playable {
 
     private Player currentPlayer;
 
+    private boolean gameRunning = false;
+
     public Game() {
         board = new Board();
         players = new ArrayList<Player>();
@@ -28,11 +30,14 @@ public class Game implements Playable {
                 System.out.println("Current player: " + currentPlayer.getNick());
             }
         }
+        if (players.size() == MAX_PLAYERS) {
+            gameRunning = true;
+        }
     }
 
     public void makeMove(Player player, Coordinates coordinates) throws RemoteException {
         System.out.println("Moving and current player is: " + currentPlayer.getNick());
-        if (player.getNick().equals(currentPlayer.getNick())) {
+        if (gameRunning && player.getNick().equals(currentPlayer.getNick())) {
             if (board.getField(coordinates) == Board.EMPTY) {
                 board.setField(coordinates,player.getSymbol());
                 chooseNextPlayer();
