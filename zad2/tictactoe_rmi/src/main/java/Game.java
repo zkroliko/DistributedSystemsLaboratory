@@ -15,6 +15,8 @@ public class Game implements Playable {
 
     private Player currentPlayer;
 
+    private Player winner;
+
     private boolean gameRunning = false;
 
     public Game() {
@@ -42,6 +44,16 @@ public class Game implements Playable {
                 board.setField(coordinates,player.getSymbol());
                 chooseNextPlayer();
             }
+        } else {
+            System.out.println("Bad move by: " + currentPlayer.getNick());
+        }
+        try {
+            if (VictorySolver.victoryExists(board,players)) {
+                winner = VictorySolver.findWinner(board,players);
+                System.out.println("Winner is : " + winner.getNick());
+            }
+        } catch (PlayerNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

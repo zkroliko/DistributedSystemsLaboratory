@@ -44,4 +44,8 @@ public class Board implements Serializable {
     public char[][] getFields() {
         return fields;
     }
+
+    public void setFields(char[][] fields) {
+        this.fields = fields;
+    }
 }
