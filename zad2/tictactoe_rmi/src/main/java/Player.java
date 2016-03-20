@@ -18,4 +18,5 @@ public class Player implements Serializable {
     public char getSymbol() {
         return symbol;
     }
+
 }
