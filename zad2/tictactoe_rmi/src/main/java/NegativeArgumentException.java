@@ -1,5 +1,5 @@
 
-public class NegativeArgumentException extends Exception {
+public class NegativeArgumentException extends RuntimeException {
 
     public NegativeArgumentException() {
         super();

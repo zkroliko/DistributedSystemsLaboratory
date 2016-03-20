@@ -2,7 +2,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
-public class Client {
+public class Client implements IClient {
 
     public static final String ADDRESS = "rmi://127.0.0.1:1099/game";
 
@@ -18,17 +18,16 @@ public class Client {
         try {
             local = new Player(args[0],args[1].charAt(0));
 
-            System.err.println( "Rejestrujemy sie" );
-            game = (Playable) Naming.lookup(ADDRESS);
-            scanner = new Scanner(System.in);
+            System.err.println( "Registering with nickname " + local.getNick() );
+            game = (Playable) Naming.lookup(args[2]);
 
             game.register(local, new GameListener());
 
-            if (args[3].equals(BOT_OPTION)) {
+            if (args.length > 3 && args[3].equals(BOT_OPTION)) {
                 game.fillWithBots();
             }
 
-            this.local = local;
+            scanner = new Scanner(System.in);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,10 +51,13 @@ public class Client {
         }
     }
 
-    private void makeMove() throws RemoteException, NegativeArgumentException {
+    public void makeMove() throws RemoteException, NegativeArgumentException {
             System.out.println("Oto plansza:\n" + game.getBoard());
             int x = -1, y = -1;
             while ( !validInput(x,y) || !game.getCurrentPlayer().getNick().equals(local.getNick())) {
+                if (game.getCurrentPlayer().getNick().equals(local.getNick())) {
+                    System.out.println("Twoj ruch!\n");
+                }
                 System.out.println("Podaj skladnik x ruchu");
                 x = scanner.nextInt();
                 System.out.println("Podaj skladnik y ruchu");

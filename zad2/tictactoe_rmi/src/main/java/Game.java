@@ -26,7 +26,7 @@ public class Game implements Playable {
         bots = new HashMap<Player, Bot>();
     }
 
-    public void register(Player player, IGameListener listener) throws RemoteException {
+    public synchronized void register(Player player, IGameListener listener) throws RemoteException {
         if (players.size() < MAX_PLAYERS) {
             players.add(player);
             listeners.add(listener);
@@ -47,7 +47,7 @@ public class Game implements Playable {
         }
     }
 
-    public void makeMove(Player player, Coordinates coordinates) throws RemoteException {
+    public synchronized void makeMove(Player player, Coordinates coordinates) throws RemoteException {
         if (gameRunning) {
             System.out.println("Moving and current player is: " + currentPlayer.getNick());
             if (gameRunning && player.getNick().equals(currentPlayer.getNick())) {
