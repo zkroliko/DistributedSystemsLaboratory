@@ -11,8 +11,6 @@ public class Game implements Playable {
 
     private Map<Player, Bot> bots;
 
-    private List<IGameListener> listeners;
-
     private Player currentPlayer;
 
     private Player winner;
@@ -22,19 +20,16 @@ public class Game implements Playable {
     public Game() {
         board = new Board();
         players = new ArrayList<Player>();
-        listeners = new ArrayList<IGameListener>();
         bots = new HashMap<Player, Bot>();
     }
 
-    public synchronized void register(Player player, IGameListener listener) throws RemoteException {
+    public void register(Player player) throws RemoteException {
         if (players.size() < MAX_PLAYERS) {
             players.add(player);
-            listeners.add(listener);
             if (players.size() == 1) {
                 currentPlayer = player;
                 System.out.println("Current player: " + currentPlayer.getNick());
-
-                // Making it easy on human player
+                // Making it easy on human player (because he moves first)
                 checkBots();
             }
         } else {
@@ -43,11 +38,15 @@ public class Game implements Playable {
         if (players.size() == MAX_PLAYERS) {
             gameRunning = true;
             System.err.println("Running game with: " + players.size() + " players");
-
+            try {
+                notifyPlayersStart();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public synchronized void makeMove(Player player, Coordinates coordinates) throws RemoteException {
+    public void makeMove(Player player, Coordinates coordinates) throws RemoteException {
         if (gameRunning) {
             System.out.println("Moving and current player is: " + currentPlayer.getNick());
             if (gameRunning && player.getNick().equals(currentPlayer.getNick())) {
@@ -60,12 +59,13 @@ public class Game implements Playable {
                             winner = VictorySolver.findWinner(board, players);
                             gameRunning = false;
                             System.out.println("Winner is : " + winner.getNick());
+                            notifyPlayersVictory();
                         } else {
                             // No victory
                             chooseNextPlayer();
-                            notifyPlayers();
+                            notifyPlayersMove();
                         }
-                    } catch (PlayerNotFoundException e) {
+                    } catch (PlayerNotFoundException | InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
@@ -78,9 +78,25 @@ public class Game implements Playable {
             }
         }
 
-    private void notifyPlayers() throws RemoteException {
-        for (IGameListener l: listeners) {
-            l.onMove();
+    private void notifyPlayersMove() throws RemoteException, InterruptedException {
+        for (Player p : players) {
+            if (p == currentPlayer) {
+                System.out.println("Notifying the player on his move: " + currentPlayer.getNick());
+                p.move();
+            } else {
+                System.out.println("Notifying the player of somebody's else move: " + currentPlayer.getNick());
+                p.move();
+            }
+        }
+    }
+
+    private void notifyPlayersStart() throws RemoteException, InterruptedException {
+        notifyPlayersMove();
+    }
+
+    private void notifyPlayersVictory() throws RemoteException {
+        for (Player p : players) {
+            p.reactToVictory();
         }
     }
 
@@ -101,9 +117,7 @@ public class Game implements Playable {
     private void moveBot(Bot bot) {
         try {
             bot.makeMove();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (NegativeArgumentException e) {
+        } catch (RemoteException | NegativeArgumentException e) {
             e.printStackTrace();
         }
     }
@@ -112,7 +126,7 @@ public class Game implements Playable {
     public void fillWithBots() throws RemoteException {
         while(players.size() < MAX_PLAYERS) {
             Player botPlayer = Bot.makePlayer('b');
-            register(botPlayer, new GameListener());
+            register(botPlayer);
             bots.put(botPlayer,new Bot(this,botPlayer));
         }
     }
@@ -123,6 +137,11 @@ public class Game implements Playable {
 
     public Player getCurrentPlayer() throws RemoteException {
         return currentPlayer;
+    }
+
+    @Override
+    public Player getWinner() throws RemoteException {
+        return winner;
     }
 
     @Override

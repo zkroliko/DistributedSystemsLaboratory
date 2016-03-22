@@ -1,9 +1,8 @@
 import org.fluttercode.datafactory.impl.DataFactory;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 
-public class Bot {
+public class Bot implements IListener {
 
     public static final String ADDRESS = "rmi://127.0.0.1:1099/game";
 
@@ -65,4 +64,18 @@ public class Bot {
     }
 
 
+    @Override
+    public void onGameStarted() throws RemoteException {
+
+    }
+
+    @Override
+    public void onMove() throws RemoteException {
+
+    }
+
+    @Override
+    public void onVictory() throws RemoteException {
+
+    }
 }
