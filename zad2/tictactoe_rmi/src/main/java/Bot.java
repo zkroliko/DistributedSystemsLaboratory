@@ -71,7 +71,7 @@ public class Bot implements IListener {
 
     @Override
     public void onMove() throws RemoteException {
-
+        makeMove();
     }
 
     @Override

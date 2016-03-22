@@ -48,4 +48,15 @@ public class Board implements Serializable {
     public void setFields(char[][] fields) {
         this.fields = fields;
     }
+
+    public static boolean fieldEmpty(int x, int y, Board board) {
+        try {
+            if (board.getField(new Coordinates(x,y)) == Board.EMPTY) {
+                return true;
+            }
+        } catch (NegativeArgumentException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
