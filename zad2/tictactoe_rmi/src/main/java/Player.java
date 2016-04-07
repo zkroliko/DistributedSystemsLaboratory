@@ -30,7 +30,7 @@ public class Player implements IPlayer {
     }
 
     @Override
-    public void onGameStarted() throws RemoteException {
+    public void reactToStart() throws RemoteException {
         listener.onGameStarted();
     }
 

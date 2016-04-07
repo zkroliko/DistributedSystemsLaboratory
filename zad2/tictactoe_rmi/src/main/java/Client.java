@@ -2,14 +2,10 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 
 public class Client implements IListener {
-
-    public static final String ADDRESS = "rmi://127.0.0.1:1099/game";
 
     public static final String BOT_OPTION = "-b";
 
@@ -27,6 +23,7 @@ public class Client implements IListener {
 
     public Client(String[] args) {
         local = new Player(args[0],args[1].charAt(0));
+        local.setListener(this);
 
         address = args[2];
 
@@ -36,10 +33,13 @@ public class Client implements IListener {
     }
 
     public void register() throws RemoteException, MalformedURLException, NotBoundException {
-        local.setListener(this);
         System.err.println( "Registering with nickname " + local.getNick() );
         game = (Playable) Naming.lookup(address);
         game.register(local);
+
+        if (wantBots) {
+            game.fillWithBots();
+        }
     }
 
     public static void main(String[] args) {
@@ -52,18 +52,19 @@ public class Client implements IListener {
         }
     }
 
-
     public void distribute() throws RemoteException {
         IListener stub = (IListener) UnicastRemoteObject.exportObject(this, 0);
-        Registry reg = LocateRegistry.getRegistry();
-        reg.rebind("Client", stub);
+//        Registry reg = LocateRegistry.getRegistry();
+//        reg.rebind("Client", stub);
     }
 
 
     private void makeMove() throws RemoteException {
+        if (game.isRunning()) {
             displayBoard();
             Coordinates move = getCoordinates();
-            game.makeMove(local,move);
+            game.makeMove(local, move);
+        }
     }
 
     private Coordinates getCoordinates() throws RemoteException {
@@ -90,8 +91,13 @@ public class Client implements IListener {
         System.out.println("Oto plansza:\n" + game.getBoard());
     }
 
-    private static boolean validInput(int x, int y) {
-        return !(x < 0 || x >= Board.SIZE_X || y < 0 || y >= Board.SIZE_Y);
+    private boolean validInput(int x, int y) throws RemoteException {
+        if (!(x < 0 || x >= Board.SIZE_X || y < 0 || y >= Board.SIZE_Y)) {
+            if (Board.fieldEmpty(x,y,game.getBoard())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isCurrentPlayer() throws RemoteException {
@@ -104,17 +110,15 @@ public class Client implements IListener {
             makeMove();
         }  else {
             System.out.println(String.format("Pierwszy rusza sie %s", game.getCurrentPlayer().getNick()));
-            displayBoard();
         }
     }
 
     public void onMove() throws RemoteException {
+        displayBoard();
         if (isCurrentPlayer()) {
             System.out.println("Twoj ruch!");
             makeMove();
         } else {
-            System.out.println(String.format("Ruch gracza"));
-            displayBoard();
             System.out.println(String.format("Teraz rusza sie %s", game.getCurrentPlayer().getNick()));
         }
     }

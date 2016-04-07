@@ -3,8 +3,6 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class Server {
 
-    public static final String ADDRESS = "rmi://127.0.0.1:1099/game";
-
     private static Playable game;
 
     public static void main(String[] args) {
