@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="openjms-net-0.7.7-beta-1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/openjms-net-0.7.7-beta-1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
