@@ -1,5 +1,6 @@
+import org.exolab.jms.client.JmsQueue;
 import org.exolab.jms.client.JmsTopic;
-import org.exolab.jms.config.*;
+import org.exolab.jms.message.TextMessageImpl;
 
 import javax.jms.*;
 import javax.jms.TopicConnectionFactory;
@@ -12,14 +13,19 @@ public class ExpSolver extends Agent {
     private Applicable operation;
 
 	// JMS Administrative objects
-	private Topic inputTopic;
+	private Topic discovery;
     private Topic outputTopic;
+    private Queue expressionInput;
 
 	// JMS Client objects
 	private TopicConnection connection;
 	private TopicSession session;
 	private TopicPublisher publisher;
-    private TopicSubscriber subscriber;
+    private TopicSubscriber producerSubscriber;
+
+    private QueueConnection queueConnection;
+    private QueueSession queueSession;
+    private QueueReceiver expressionReceiver;
 
 	public ExpSolver() throws NamingException, JMSException, InvalidOperationException {
 		super();
@@ -35,20 +41,25 @@ public class ExpSolver extends Agent {
 
     @Override
     protected void initializeTopics() {
-        inputTopic = new JmsTopic("queries" + type);
+        discovery = new JmsTopic("findingSolvers" + type);
         outputTopic = new JmsTopic("solutions" + type);
     }
 
     @Override
     protected void initializeQueues() {
-
+        expressionInput = new JmsQueue(agentName+type);
     }
 
 	protected void initializeJmsClientObjects() throws JMSException {
 		connection = ((TopicConnectionFactory)connectionFactory).createTopicConnection();
 		session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         publisher = session.createPublisher(outputTopic);
-        subscriber = session.createSubscriber(inputTopic);
+        producerSubscriber = session.createSubscriber(discovery);
+
+        queueConnection = ((QueueConnectionFactory)connectionFactory).createQueueConnection();
+        queueSession = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+        expressionReceiver = queueSession.createReceiver(expressionInput);
+
         System.out.println("JMS client objects (Session, MessageConsumer) initialized!");
     }
 
@@ -79,10 +90,31 @@ public class ExpSolver extends Agent {
 
     public void start() throws JMSException, IOException {
 
-        subscriber.setMessageListener(new MessageListener() {
+        producerSubscriber.setMessageListener(new MessageListener() {
             @Override
             public void onMessage(Message message) {
-                System.out.println("Message received");
+                if (message instanceof TextMessage) {
+                    try {
+                        System.out.println("Producer discovery message received");
+                        System.out.println(((TextMessage) message).getText() + " is looking for solver");
+                        Queue producerSolicitation = new JmsQueue(((TextMessage) message).getText());
+                        QueueSender sender = queueSession.createSender(producerSolicitation);
+                        TextMessage response = queueSession.createTextMessage(agentName+type);
+                        sender.send(response);
+                        System.out.println(sender.getDestination());
+                        System.out.println("Responded to discovery message with: " + response);
+                    } catch (JMSException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+
+        expressionReceiver.setMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(Message message) {
+                System.out.println("Expression message received");
                 if (message instanceof ObjectMessage) {
                     try {
                         Expression exp = (Expression) ((ObjectMessage)message).getObject();

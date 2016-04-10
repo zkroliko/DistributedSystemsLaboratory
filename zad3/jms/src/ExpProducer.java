@@ -14,17 +14,19 @@ public class ExpProducer extends Agent {
 
 	// JMS Administrative objects
     private Topic solverDiscovery;
+    private Queue foundSolver;
     private Queue expressionSending;
 
 
 	// JMS Client objects
 	private TopicConnection topicConnection;
-	private TopicSession topicSession;
+	private TopicSession discoverySession;
 	private TopicPublisher publisher;
 
     private QueueConnection queueConnection;
     private QueueSession queueSession;
     private QueueSender sender;
+    private QueueReceiver receiver;
 
     // Waiting for solver
 
@@ -43,22 +45,23 @@ public class ExpProducer extends Agent {
 
     @Override
     protected void initializeTopics() {
-        solverDiscovery = new JmsTopic("queries" + type);
+        solverDiscovery = new JmsTopic("findingSolvers" + type);
     }
 
     @Override
     protected void initializeQueues() {
-        expressionSending = new JmsQueue("findSolver" + type);
+        foundSolver = new JmsQueue(agentName+type);
     }
 
 	protected void initializeJmsClientObjects() throws JMSException {
 		topicConnection = ((TopicConnectionFactory)connectionFactory).createTopicConnection();
-		topicSession = topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-        publisher = topicSession.createPublisher(solverDiscovery);
+		discoverySession = topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+        publisher = discoverySession.createPublisher(solverDiscovery);
 
         queueConnection = ((QueueConnectionFactory)connectionFactory).createQueueConnection();
         queueSession = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-        sender = queueSession.createSender(expressionSending);
+        receiver = queueSession.createReceiver(foundSolver);
+
 		System.out.println("JMS client objects (Session, MessageConsumer) initialized!");
 	}
 
@@ -90,15 +93,6 @@ public class ExpProducer extends Agent {
         }
 	}
 
-    private String findSolver() {
-        System.out.println("Finding a solver for " + type);
-
-//        msg = Message
-//        publisher.
-//
-        return null;
-    }
-
     private Expression createExpression(String userInput) throws JMSException, InvalidInputException {
         Pattern p = Pattern.compile("(.+)([\\+|\\-|\\*|\\/])(.+)");
         Matcher m = p.matcher(userInput);
@@ -119,14 +113,47 @@ public class ExpProducer extends Agent {
     }
 
     private void publishExpression(Expression exp) throws JMSException, InvalidOperationException {
+        // First we must find a solver
+        notifySolvers();
+        // Now a solver has been found
         if (exp.getOperation().equals(type)) {
-            ObjectMessage msg = topicSession.createObjectMessage();
+            System.out.println("Sending expression");
+            ObjectMessage msg = discoverySession.createObjectMessage();
             msg.setObject(exp);
-            publisher.publish(msg);
-            System.out.println("Query published");
+            sender.send(msg);
+            System.out.println("Expression sent to solver");
         } else {
             String msg = "Invalid operand in expression. Agent configured to operand " + type;
             throw new InvalidOperationException(msg);
+        }
+    }
+
+    private void notifySolvers() throws JMSException {
+
+        TextMessage msg = discoverySession.createTextMessage(foundSolver.getQueueName());
+
+        boolean waitingForSolver = true;
+        while (waitingForSolver) {
+            publisher.publish(msg);
+            System.out.println("Asked for a solver with: " + msg.getText());
+
+            System.out.println("Waiting for a solver on queue: " + receiver.getQueue().getQueueName());
+            System.out.println(receiver.getQueue());
+            Message input = receiver.receive(1000);
+            if (input instanceof TextMessage) {
+                System.out.println("Found solver for " + type);
+                System.out.println("Solver is: " + ((TextMessage) input).getText());
+
+                expressionSending = new JmsQueue(((TextMessage) input).getText());
+                sender = queueSession.createSender(expressionSending);
+                waitingForSolver = false;
+            } else {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

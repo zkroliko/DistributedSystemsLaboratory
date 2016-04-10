@@ -36,7 +36,7 @@ public abstract class Agent {
     }
 
     public Agent(String type, String providerUrl) throws NamingException, JMSException, InvalidOperationException {
-        this.agentName = "Agent " + new Random().nextInt();
+        this.agentName = "Agent" + new Random().nextInt();
         this.type = type;
         initializeJndiContext(providerUrl);
         initializeObjects();
