@@ -16,7 +16,6 @@ import javax.naming.NamingException;
 public class ExpProducer extends Agent {
 
 	// JMS Administrative objects
-	private TopicConnectionFactory connectionFactory;
     private Topic outputTopic;
 	
 	// JMS Client objects
@@ -36,28 +35,30 @@ public class ExpProducer extends Agent {
 		super(type,providerUrl);
 	}
 
-    protected void initializeObjects() throws NamingException, JMSException {
-        initializeAdministrativeObjects(type);
-        initializeJmsClientObjects();
+
+    @Override
+    protected void initializeTopics() {
+        outputTopic = new JmsTopic("queries" + type);
     }
 
-	private void initializeAdministrativeObjects(String type) throws NamingException {
-		// ConnectionFactory
-		connectionFactory = (TopicConnectionFactory) jndiContext.lookup("ConnectionFactory");
-		// Destination
-        //outputTopic = (Topic) jndiContext.lookup("production" + type);
-        outputTopic = new JmsTopic("queries" + type);
-		System.out.println("JMS administrative objects (ConnectionFactory, Destinations) initialized!");
-	}
-	
-	private void initializeJmsClientObjects() throws JMSException {
-		connection = connectionFactory.createTopicConnection();
+    @Override
+    protected void initializeQueues() {
+
+    }
+
+	protected void initializeJmsClientObjects() throws JMSException {
+		connection = ((TopicConnectionFactory)connectionFactory).createTopicConnection();
 		session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
 		publisher = session.createPublisher(outputTopic);
 		System.out.println("JMS client objects (Session, MessageConsumer) initialized!");
 	}
 
-	public void start() throws JMSException, IOException {
+    @Override
+    protected void initializeAdditionalComponents() throws InvalidOperationException {
+
+    }
+
+    public void start() throws JMSException, IOException {
 
 		connection.start();
 		System.out.println("Connection started - sending messages possible!");

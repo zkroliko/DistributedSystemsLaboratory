@@ -1,21 +1,17 @@
 import org.exolab.jms.client.JmsTopic;
+import org.exolab.jms.config.*;
 
 import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
+import javax.jms.TopicConnectionFactory;
 import javax.naming.NamingException;
 import java.io.IOException;
-import java.util.Properties;
-import java.util.Random;
 
 public class ExpSolver extends Agent {
-
 
     // Type
     private Applicable operation;
 
 	// JMS Administrative objects
-	private TopicConnectionFactory connectionFactory;
 	private Topic inputTopic;
     private Topic outputTopic;
 
@@ -37,33 +33,33 @@ public class ExpSolver extends Agent {
 		super(type,providerUrl);
 	}
 
-    protected void initializeObjects() throws NamingException, JMSException, InvalidOperationException {
-        initializeAdministrativeObjects(type);
-        initializeJmsClientObjects();
-        initializeOperation(type);
+    @Override
+    protected void initializeTopics() {
+        inputTopic = new JmsTopic("queries" + type);
+        outputTopic = new JmsTopic("solutions" + type);
     }
 
-	private void initializeAdministrativeObjects(String type) throws NamingException {
-		// ConnectionFactory
-		connectionFactory = (TopicConnectionFactory) jndiContext.lookup("ConnectionFactory");
-		// Destination
-//      inputTopic = (Topic) jndiContext.lookup("production" + type);
-//      outputTopic = (Topic) jndiContext.lookup("distribution" + type);
-		inputTopic = new JmsTopic("queries" + type);
-        outputTopic = new JmsTopic("solutions" + type);
-		System.out.println("JMS administrative objects (ConnectionFactory, Destinations) initialized!");
-	}
-	
-	private void initializeJmsClientObjects() throws JMSException {
-		connection = connectionFactory.createTopicConnection();
+    @Override
+    protected void initializeQueues() {
+
+    }
+
+	protected void initializeJmsClientObjects() throws JMSException {
+		connection = ((TopicConnectionFactory)connectionFactory).createTopicConnection();
 		session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         publisher = session.createPublisher(outputTopic);
         subscriber = session.createSubscriber(inputTopic);
         System.out.println("JMS client objects (Session, MessageConsumer) initialized!");
     }
 
-    private void initializeOperation(String type) throws InvalidOperationException {
-        switch (type) {
+    @Override
+    protected void initializeAdditionalComponents() throws InvalidOperationException {
+        initializeOperation();
+    }
+
+
+    private void initializeOperation() throws InvalidOperationException {
+        switch (this.type) {
             case "+":
                 this.operation = ((first, second) -> first + second);
                 break;
@@ -74,7 +70,7 @@ public class ExpSolver extends Agent {
                 this.operation = ((first, second) -> first * second);
                 break;
             case "/":
-                this.operation = ((first, second) -> first + Double.max(java.lang.Math.ulp(second),second));
+                this.operation = ((first, second) -> first / second);
                 break;
             default:
                 throw new InvalidOperationException("Operator " + type + " not supported");
@@ -119,7 +115,6 @@ public class ExpSolver extends Agent {
                 e.printStackTrace();
             }
         }
-		
 	}
 
     protected void closeConnection() {

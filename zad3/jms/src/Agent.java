@@ -1,3 +1,6 @@
+import org.exolab.jms.client.JmsTopic;
+
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -14,6 +17,9 @@ public abstract class Agent {
 
     // Type
     protected String type;
+
+    // JMS Administrative objects
+    protected ConnectionFactory connectionFactory;
 
     // Application JNDI context
     protected Context jndiContext;
@@ -36,8 +42,6 @@ public abstract class Agent {
         initializeObjects();
     }
 
-    protected abstract void initializeObjects() throws NamingException, JMSException, InvalidOperationException;
-
     protected void initializeJndiContext(String providerUrl) throws NamingException {
         // JNDI Context
         Properties props = new Properties();
@@ -46,6 +50,31 @@ public abstract class Agent {
         jndiContext = new InitialContext(props);
         System.out.println("JNDI context initialized!");
     }
+
+    protected void initializeObjects() throws NamingException, JMSException, InvalidOperationException {
+        initializeAdministrativeObjects();
+        initializeJmsClientObjects();
+        initializeAdditionalComponents();
+    }
+
+    private void initializeAdministrativeObjects() throws NamingException {
+        connectionFactory = (ConnectionFactory) jndiContext.lookup("ConnectionFactory");
+
+        // Destinations
+        initializeTopics();
+        initializeQueues();
+        System.out.println("JMS administrative objects (ConnectionFactory, Destinations) initialized!");
+    }
+
+    protected abstract void initializeTopics();
+
+    protected abstract void initializeQueues();
+
+    protected abstract void initializeJmsClientObjects() throws JMSException;
+
+    protected abstract void initializeAdditionalComponents() throws InvalidOperationException;
+
+    // Business logic
 
     public abstract void start() throws JMSException, IOException;
 

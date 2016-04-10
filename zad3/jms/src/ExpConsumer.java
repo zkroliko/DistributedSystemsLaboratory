@@ -11,15 +11,12 @@ import java.util.Random;
 public class ExpConsumer extends Agent {
 
 	// JMS Administrative objects
-	private TopicConnectionFactory connectionFactory;
 	private Topic inputTopic;
 
 	// JMS Client objects
 	private TopicConnection connection;
 	private TopicSession session;
-	private TopicPublisher publisher;
 	private TopicSubscriber subscriber;
-
 
 	public ExpConsumer() throws NamingException, JMSException, InvalidOperationException {
 		super();
@@ -33,48 +30,48 @@ public class ExpConsumer extends Agent {
 		super(type,providerUrl);
 	}
 
-    protected void initializeObjects() throws NamingException, JMSException {
-        initializeAdministrativeObjects(type);
-        initializeJmsClientObjects();
+    @Override
+    protected void initializeTopics() {
+        inputTopic = new JmsTopic("solutions" + type);
     }
 
-	private void initializeAdministrativeObjects(String type) throws NamingException {
-		// ConnectionFactory
-		connectionFactory = (TopicConnectionFactory) jndiContext.lookup("ConnectionFactory");
-		// Destination
-//      inputTopic = (Topic) jndiContext.lookup("production" + type);
-		this.type = type;
-		inputTopic = new JmsTopic("solutions" + type);
-		System.out.println("JMS administrative objects (ConnectionFactory, Destinations) initialized!");
-	}
+    @Override
+    protected void initializeQueues() {
 
-	private void initializeJmsClientObjects() throws JMSException {
-		connection = connectionFactory.createTopicConnection();
+    }
+
+	protected void initializeJmsClientObjects() throws JMSException {
+		connection = ((TopicConnectionFactory)connectionFactory).createTopicConnection();
 		session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
 		subscriber = session.createSubscriber(inputTopic);
 		System.out.println("JMS client objects (Session, MessageConsumer) initialized!");
 	}
 
-	public void start() throws JMSException, IOException {
+    @Override
+    protected void initializeAdditionalComponents() throws InvalidOperationException {
 
-		subscriber.setMessageListener(new MessageListener() {
-			@Override
-			public void onMessage(Message message) {
-				System.out.println("Message received");
-				if (message instanceof ObjectMessage) {
-					try {
-						Expression exp = (Expression) ((ObjectMessage)message).getObject();
+    }
+
+    public void start() throws JMSException, IOException {
+
+        subscriber.setMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(Message message) {
+                System.out.println("Message received");
+                if (message instanceof ObjectMessage) {
+                    try {
+                        Expression exp = (Expression) ((ObjectMessage)message).getObject();
                         if (exp.isSolved()) {
                             System.out.println("Received solved expression: " + exp);;
                         } else {
                             System.err.println("Received expression but it's not solved");
                         }
-					} catch (JMSException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		});
+                    } catch (JMSException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
 
 		connection.start();
 		String msg = String.format("Connection started - reading messages of type %s possible!", type);
