@@ -22,26 +22,21 @@ public class ExpConsumer extends Agent {
 
 
 	public ExpConsumer() throws NamingException, JMSException, InvalidOperationException {
-		this("Client " + new Random().nextInt());
+		super();
 	}
 
-	public ExpConsumer(String clientName) throws NamingException, JMSException, InvalidOperationException {
-		this(clientName, DEFAULT_JMS_PROVIDER_URL, DEFAULT_TYPE);
+	public ExpConsumer(String type) throws NamingException, JMSException, InvalidOperationException {
+		super(type);
 	}
 
-	public ExpConsumer(String clientName, String providerUrl, String type) throws NamingException, JMSException, InvalidOperationException {
-		this.agent = clientName;
-		initializeJndiContext(providerUrl);
+	public ExpConsumer(String type, String providerUrl) throws NamingException, JMSException, InvalidOperationException {
+		super(type,providerUrl);
 	}
 
-	private void initializeJndiContext(String providerUrl) throws NamingException {
-		// JNDI Context
-		Properties props = new Properties();
-		props.put(Context.INITIAL_CONTEXT_FACTORY, JNDI_CONTEXT_FACTORY_CLASS_NAME);
-		props.put(Context.PROVIDER_URL, providerUrl);
-		jndiContext = new InitialContext(props);
-		System.out.println("JNDI context initialized!");
-	}
+    protected void initializeObjects() throws NamingException, JMSException {
+        initializeAdministrativeObjects(type);
+        initializeJmsClientObjects();
+    }
 
 	private void initializeAdministrativeObjects(String type) throws NamingException {
 		// ConnectionFactory
@@ -95,24 +90,15 @@ public class ExpConsumer extends Agent {
 
 	}
 
-	public void stop() {
-		// close the context
-		if (jndiContext != null) {
-			try {
-				jndiContext.close();
-			} catch (NamingException exception) {
-				exception.printStackTrace();
-			}
-		}
-
-		// close the connection
-		if (connection != null) {
-			try {
-				connection.close();
-			} catch (JMSException exception) {
-				exception.printStackTrace();
-			}
-		}
-	}
+    protected void closeConnection() {
+        // close the connection
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (JMSException exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
 
 }

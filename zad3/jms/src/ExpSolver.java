@@ -8,18 +8,11 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
 
-public class ExpSolver {
+public class ExpSolver extends Agent {
 
-	private static final String JNDI_CONTEXT_FACTORY_CLASS_NAME = "org.exolab.jms.jndi.InitialContextFactory";
-	private static final String DEFAULT_JMS_PROVIDER_URL = "tcp://localhost:3035/";
-	private static final String DEFAULT_TYPE = "+";
 
     // Type
-    private String type;
     private Applicable operation;
-
-	// Application JNDI context
-	private Context jndiContext;
 
 	// JMS Administrative objects
 	private TopicConnectionFactory connectionFactory;
@@ -32,34 +25,23 @@ public class ExpSolver {
 	private TopicPublisher publisher;
     private TopicSubscriber subscriber;
 
-	// Business Logic
-	private String clientName;
-
 	public ExpSolver() throws NamingException, JMSException, InvalidOperationException {
-		this.type = DEFAULT_TYPE;
+		super();
 	}
 
 	public ExpSolver(String type) throws NamingException, JMSException, InvalidOperationException {
-		this(type, DEFAULT_JMS_PROVIDER_URL);
+		super(type);
 	}
 
 	public ExpSolver(String type, String providerUrl) throws NamingException, JMSException, InvalidOperationException {
-		this.clientName = "Client " + new Random().nextInt();
-        this.type = type;
-		initializeJndiContext(providerUrl);
-		initializeAdministrativeObjects(type);
-		initializeJmsClientObjects();
-        initializeOperation(type);
+		super(type,providerUrl);
 	}
 
-	private void initializeJndiContext(String providerUrl) throws NamingException {
-		// JNDI Context
-		Properties props = new Properties();
-		props.put(Context.INITIAL_CONTEXT_FACTORY, JNDI_CONTEXT_FACTORY_CLASS_NAME);
-		props.put(Context.PROVIDER_URL, providerUrl);
-		jndiContext = new InitialContext(props);
-		System.out.println("JNDI context initialized!");
-	}
+    protected void initializeObjects() throws NamingException, JMSException, InvalidOperationException {
+        initializeAdministrativeObjects(type);
+        initializeJmsClientObjects();
+        initializeOperation(type);
+    }
 
 	private void initializeAdministrativeObjects(String type) throws NamingException {
 		// ConnectionFactory
@@ -140,16 +122,7 @@ public class ExpSolver {
 		
 	}
 
-    public void stop() {
-		// close the context
-        if (jndiContext != null) {
-            try {
-            	jndiContext.close();
-            } catch (NamingException exception) {
-                exception.printStackTrace();
-            }
-        }
-
+    protected void closeConnection() {
         // close the connection
         if (connection != null) {
             try {
@@ -158,7 +131,7 @@ public class ExpSolver {
                 exception.printStackTrace();
             }
         }
-	}
+    }
 
     public void solveExpression(Expression exp) throws InvalidOperationException {
         if (exp.getOperation().equals(type))

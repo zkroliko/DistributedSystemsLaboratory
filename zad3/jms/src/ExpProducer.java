@@ -13,18 +13,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-public class ExpProducer {
+public class ExpProducer extends Agent {
 
-	private static final String JNDI_CONTEXT_FACTORY_CLASS_NAME = "org.exolab.jms.jndi.InitialContextFactory";
-	private static final String DEFAULT_JMS_PROVIDER_URL = "tcp://localhost:3035/";
-	private static final String DEFAULT_TYPE = "+";
-
-    // Type
-    private String type;
-
-	// Application JNDI context
-	private Context jndiContext;
-	
 	// JMS Administrative objects
 	private TopicConnectionFactory connectionFactory;
     private Topic outputTopic;
@@ -33,33 +23,23 @@ public class ExpProducer {
 	private TopicConnection connection;
 	private TopicSession session;
 	private TopicPublisher publisher;
-	
-	// Business Logic
-	private String clientName;
-	
-	public ExpProducer() throws NamingException, JMSException {
-		this("Client " + new Random().nextInt());
-	}
-	
-	public ExpProducer(String clientName) throws NamingException, JMSException {
-		this(clientName, DEFAULT_JMS_PROVIDER_URL, DEFAULT_TYPE);
-	}
-	
-	public ExpProducer(String clientName, String providerUrl, String type) throws NamingException, JMSException {
-		this.clientName = clientName;
-		initializeJndiContext(providerUrl);
-		initializeAdministrativeObjects(type);
-		initializeJmsClientObjects();
+
+	public ExpProducer() throws NamingException, JMSException, InvalidOperationException {
+		super();
 	}
 
-	private void initializeJndiContext(String providerUrl) throws NamingException {
-		// JNDI Context
-		Properties props = new Properties();
-		props.put(Context.INITIAL_CONTEXT_FACTORY, JNDI_CONTEXT_FACTORY_CLASS_NAME);
-		props.put(Context.PROVIDER_URL, providerUrl);
-		jndiContext = new InitialContext(props);
-		System.out.println("JNDI context initialized!");
+	public ExpProducer(String type) throws NamingException, JMSException, InvalidOperationException {
+		super(type);
 	}
+
+	public ExpProducer(String type, String providerUrl) throws NamingException, JMSException, InvalidOperationException {
+		super(type,providerUrl);
+	}
+
+    protected void initializeObjects() throws NamingException, JMSException {
+        initializeAdministrativeObjects(type);
+        initializeJmsClientObjects();
+    }
 
 	private void initializeAdministrativeObjects(String type) throws NamingException {
 		// ConnectionFactory
@@ -118,16 +98,8 @@ public class ExpProducer {
         }
     }
 
-	public void stop() {
-		// close the context
-        if (jndiContext != null) {
-            try {
-            	jndiContext.close();
-            } catch (NamingException exception) {
-                exception.printStackTrace();
-            }
-        }
 
+    protected void closeConnection() {
         // close the connection
         if (connection != null) {
             try {
@@ -136,7 +108,7 @@ public class ExpProducer {
                 exception.printStackTrace();
             }
         }
-	}
+    }
 
 
 }

@@ -2,6 +2,7 @@ import javax.jms.JMSException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
 
@@ -20,22 +21,22 @@ public abstract class Agent {
     // Business Logic
     protected String agentName;
 
-    public ExpSolver() throws NamingException, JMSException, InvalidOperationException {
-        this.type = DEFAULT_TYPE;
+    public Agent() throws NamingException, JMSException, InvalidOperationException {
+        this(DEFAULT_TYPE);
     }
 
-    public ExpSolver(String type) throws NamingException, JMSException, InvalidOperationException {
+    public Agent(String type) throws NamingException, JMSException, InvalidOperationException {
         this(type, DEFAULT_JMS_PROVIDER_URL);
     }
 
-    public ExpSolver(String type, String providerUrl) throws NamingException, JMSException, InvalidOperationException {
-        this.clientName = "Client " + new Random().nextInt();
+    public Agent(String type, String providerUrl) throws NamingException, JMSException, InvalidOperationException {
+        this.agentName = "Agent " + new Random().nextInt();
         this.type = type;
         initializeJndiContext(providerUrl);
-        initializeAdministrativeObjects(type);
-        initializeJmsClientObjects();
-        initializeOperation(type);
+        initializeObjects();
     }
+
+    protected abstract void initializeObjects() throws NamingException, JMSException, InvalidOperationException;
 
     protected void initializeJndiContext(String providerUrl) throws NamingException {
         // JNDI Context
@@ -45,4 +46,20 @@ public abstract class Agent {
         jndiContext = new InitialContext(props);
         System.out.println("JNDI context initialized!");
     }
+
+    public abstract void start() throws JMSException, IOException;
+
+    public void stop() {
+        // close the context
+        if (jndiContext != null) {
+            try {
+                jndiContext.close();
+            } catch (NamingException exception) {
+                exception.printStackTrace();
+            }
+        }
+        closeConnection();
+    }
+
+    protected abstract void closeConnection();
 }
