@@ -6,15 +6,17 @@ public class ExpSolverMain {
 		try {
 			if (args.length > 0) {
 				String arg = args[0];
-				if ("+-*/".contains(arg) && arg.length() == 1)
-					expSolver = new ExpSolver(args[0]);
-				else {
+				if ("+-*/".contains(arg) && arg.length() == 1) {
+                    expSolver = new ExpSolver(args[0]);
+                } else {
 					System.err.println("Invalid operation as argument");
 					System.exit(-1);
 				}
 			} else {
 				expSolver = new ExpSolver();
+                expSolver.start();
 			}
+            expSolver.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

@@ -6,9 +6,9 @@ public class ExpConsumerMain {
 		try {
 			if (args.length > 0) {
                 String arg = args[0];
-                if ("+-*/".contains(arg) && arg.length() == 1)
+                if ("+-*/".contains(arg) && arg.length() == 1) {
                     expConsumer = new ExpConsumer(args[0]);
-                else {
+                } else {
                     System.err.println("Invalid operation as argument");
                     System.exit(-1);
                 }
