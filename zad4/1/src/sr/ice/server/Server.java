@@ -11,8 +11,6 @@ package sr.ice.server;
 
 
 import Ice.Identity;
-import sr.ice.impl.CalcI;
-import sr.ice.impl.UserManagementI;
 
 public class Server
 {
@@ -31,20 +29,17 @@ public class Server
 			// METODA 2 (niepolecana): Konfiguracja adaptera Adapter1 jest w kodzie Ÿród³owym
 			Ice.ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Adapter1", "tcp -h localhost -p 10000:udp -h localhost -p 10000");
 
-			// 3. Stworzenie serwanta/serwantów
-			
-			CalcI calcServant1 = new CalcI();
-			
-		    UserManagementI umServant1 = new UserManagementI(adapter);		    
+			// 3. Stworzenie serwantów				    
 
-			Ice.ServantLocator windLocator= new AirportInfoServantLocator("locator1");
-			adapter.addServantLocator(windLocator, "runway");
+			Ice.ServantLocator windLocator= new AirportInfoServantLocator("airport locator");
+			adapter.addServantLocator(windLocator, "airportInfo");
+			
+			Ice.ServantLocator addLocator = new AddServantLocator("add locator");
+			adapter.addServantLocator(addLocator, "adder");
+			
+			Ice.ServantLocator addPoolLocator = new AddPoolServantLocator("add pool locator", 100);
+			adapter.addServantLocator(addPoolLocator, "adderpool");
 					    
-			// 4. Dodanie wpisów do ASM
-			adapter.add(calcServant1, new Identity("calc11", "calc"));
-
-//	        adapter.add(windLocator.locate(), new Identity("um11", "users"));
-	        
 
 	        // 5. Aktywacja adaptera i przejœcie w pêtlê przetwarzania ¿¹dañ
 			adapter.activate();

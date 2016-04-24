@@ -15,6 +15,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import Airfield.AirportInfo;
@@ -31,49 +35,58 @@ public class AirportInfoI extends AirportInfo
 	private String code;
 	
 	private int load;
+	
+    private Map<String, Integer> loads = new TreeMap<>();
 	    
     public AirportInfoI()
     {
         String line = "";
         try {
         	BufferedReader br = new BufferedReader(new FileReader(csvFile));
-        	if ((line = br.readLine()) != null) {
+        	while ((line = br.readLine()) != null) {
         		String[] lineStr = line.split(" ");
         		if (lineStr.length > 1) {
-            		code = lineStr[0];
-            		load = Integer.parseInt(lineStr[1]);
+            		String code = lineStr[0];
+            		int load = Integer.parseInt(lineStr[1]);
+            		loads.put(code, load);
         		}
         	}
+        	br.close();
         } catch (IOException e) {
-        	// TODO
+        	e.printStackTrace();
         }
     }
 
 	@Override
-	public String getCode(Current __current) {
-		return code;
+	public int getLoad(String code, Current __current) {
+		if (loads.containsKey(code)) {
+			System.out.println(loads.get(code));
+			return loads.get(code);
+		} else {
+			throw new NoSuchElementException("Missing value for code" + code);
+		}
+		
 	}
 
 	@Override
-	public int getLoad(Current __current) {
-		return load;
+	public void addLoad(String code, int load, Current __current) {
+		loads.put(code, load);
+		save();		
 	}
-
-	@Override
-	public void setLoad(int load, Current __current) {
-		this.load = load; 
-		save();
-	}	
 	
 	private void save() {
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(csvFile, false));
-			writer.write(String.format("%s %s", code, load));
+			for (Entry<String, Integer> entry : loads.entrySet())
+			{
+				writer.write(String.format("%s %s\n", entry.getKey(), entry.getValue()));
+			}
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
 }
 

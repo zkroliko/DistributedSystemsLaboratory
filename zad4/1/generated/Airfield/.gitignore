@@ -78,3 +78,7 @@
 /_AirportInfoOperationsNC.java
 /Callback_AirportInfo_getLoad.java
 /Callback_AirportInfo_setLoad.java
+/Callback_AirportInfo_addLoad.java
+/Callback_AirportInfo_getLoads.java
+/LoadDataFrame.java
+/LoadDataFrameHolder.java

@@ -9,6 +9,10 @@
 
 package sr.ice.client;
 
+import java.util.logging.Logger;
+
+import Adder.AdderInterfacePrx;
+import Adder.AdderInterfacePrxHelper;
 import Airfield.AirportInfoPrx;
 import Airfield.AirportInfoPrxHelper;
 import Demo.*;
@@ -16,6 +20,8 @@ import Ice.AsyncResult;
 
 public class Client 
 {
+	private static final Logger logger = Logger.getLogger(Client.class.getName());
+	
 	public static void main(String[] args) 
 	{
 		int status = 0;
@@ -26,26 +32,26 @@ public class Client
 			communicator = Ice.Util.initialize(args);
 
 			// 2. Uzyskanie referencji obiektu na podstawie linii w pliku konfiguracyjnym
-			// Ice.ObjectPrx base = communicator.propertyToProxy("Calc1.Proxy");
-			// 2. To samo co powy¿ej, ale mniej ³adnie
-			Ice.ObjectPrx base1 = communicator.stringToProxy("calc/calc11:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");
-			Ice.ObjectPrx runwayBase = communicator.stringToProxy("runway/runway:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");			
-			
-			// 3. Rzutowanie, zawê¿anie
-			CalcPrx calc1 = CalcPrxHelper.checkedCast(base1);
-			if (calc1 == null) throw new Error("Invalid proxy");
-			
-			// Runway
-			
-			AirportInfoPrx airport = AirportInfoPrxHelper.checkedCast(runwayBase);
-			if (airport == null) throw new Error("Invalid airport info proxy");
 
+			Ice.ObjectPrx airportProxy = communicator.stringToProxy("airportInfo/airport:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");			
+			Ice.ObjectPrx addProxy = communicator.stringToProxy("adder/add:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");
+			Ice.ObjectPrx addPoolProxy = communicator.stringToProxy("adderpool/addpool:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");
+									
+			// 3. Rzutowanie, zawê¿anie
+			
+			// Airport info
+			
+			AirportInfoPrx airport = AirportInfoPrxHelper.checkedCast(airportProxy);
+			if (airport == null) throw new Error("Invalid airport info proxy");			
+
+			AdderInterfacePrx add = AdderInterfacePrxHelper.checkedCast(addProxy);
+			AdderInterfacePrx addpool = AdderInterfacePrxHelper.checkedCast(addPoolProxy);
 
 			// 4. Wywolanie zdalnych operacji
 
 			String line = null;
 			java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
-			
+						
 			AsyncResult ar = null;
 						
 			do
@@ -60,42 +66,47 @@ public class Client
 					{
 						break;
 					}
-					if (line.equals("add1"))
-					{
-						float r = calc1.add1(7, 8);
-						System.out.println("RESULT (syn) = " + r);
-					}
-					if (line.equals("subtract"))
-					{
-						float r = calc1.subtract(7, 8);
-						System.out.println("RESULT (syn) = " + r);
-					}
-					if (line.equals("aiportCode"))
-					{
-						String code = airport.getCode();
-						System.out.println("Aiport code is " + code);
-					}
-					if (line.equals("getLoad"))
-					{
-						int load = airport.getLoad();
-						System.out.println("Aiport load is " + load);
-					}
-					if (line.contains("setLoad"))
+					else if (line.startsWith("getLoad"))
 					{
 						String [] split = line.split(" ");
 						if (split.length > 1) {
-							airport.setLoad(Integer.parseInt(split[1]));
+							int load = airport.getLoad(split[1]);
+							logger.info("Aiport load is " + load);
 						} else {
-							System.err.println("Incorrect input");
+							logger.warning("Incorrect input");
 						}
 					}
-					if(line.equals("add2 1"))
+					else if (line.startsWith("addLoad"))
 					{
-						
+						String [] split = line.split(" ");
+						if (split.length > 2) {
+							airport.addLoad(split[1], Integer.parseInt(split[2]));
+							logger.info("New data added.");
+						} else {
+							logger.warning("Incorrect input");
+						}
 					}
-					if(line.equals("add2 2"))
-					{
-						
+					else if (line.startsWith("add")) {
+						String[] arguments = line.split(" ");
+						if (arguments.length > 2) {
+							int a = Integer.parseInt(arguments[1]);
+							int b = Integer.parseInt(arguments[2]);
+							int result = add.add(a, b);
+							logger.info("Result of addition " + result);
+						} else {
+							logger.warning("Incorrect input");
+						}
+					}
+					else if (line.startsWith("pooladd")) {
+						String[] arguments = line.split(" ");
+						if (arguments.length > 2) {
+							int a = Integer.parseInt(arguments[1]);
+							int b = Integer.parseInt(arguments[2]);
+							int result = addpool.add(a, b);
+							logger.info("Result of addition with servant pool " + result);
+						} else {
+							logger.warning("Incorrect input");
+						}
 					}
 					else if (line.equals("x"))
 					{

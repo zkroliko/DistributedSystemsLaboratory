@@ -5,27 +5,27 @@ import Ice.LocalObjectHolder;
 import Ice.Object;
 import Ice.UserException;
 import sr.ice.impl.AirportInfoI;
-import Airfield.AirportInfo;
-import Demo.*;
 
+import java.util.logging.Logger;
 
-
-public class AirportInfoServantLocator implements Ice.ServantLocator
+public class AirportInfoServantLocator implements Ice.ServantLocator 
 {
+	private static final Logger logger = Logger.getLogger(AirportInfoServantLocator.class.getName());
+
 	private String id = null;
 	private Object servant = null;
 	
 	public AirportInfoServantLocator(String id)
 	{
 		this.id = id;
-		System.out.println("## AirportInfoServantLocator(" + id + ") ##");
+		logger.info("## AirportInfoServantLocator(" + id + ") ##");
 	}
 
 	public AirportInfoServantLocator(String id, Ice.Object servant)
 	{
 		this.id = id;
 		this.servant = servant;
-		System.out.println("## AirportInfoServantLocator(" + id + ", obj) ##");
+		logger.info("## AirportInfoServantLocator(" + id + ", obj) ##");
 	}
 
 	public Object locate(Current curr, LocalObjectHolder cookie) throws UserException 
@@ -45,18 +45,18 @@ public class AirportInfoServantLocator implements Ice.ServantLocator
 	        curr.adapter.add(servant, curr.id);
 	    }
 	    
-		System.out.println("## AirportInfoServantLocator #" +id + " .locate() ##");
+	    logger.info("## AirportInfoServantLocator #" +id + " .locate() ##");
 		
 		return servant;
 	}
 
 	public void finished(Ice.Current curr, Ice.Object servant, java.lang.Object cookie) throws UserException 
 	{
-		System.out.println("## AirportInfoServantLocator #" +id + " .finished() ##");
+		logger.info("## AirportInfoServantLocator #" +id + " .finished() ##");
 	}
 
 	public void deactivate(String category)
 	{
-		System.out.println("## ServantLocator1 #" +id + " .deactivate() ##");
+		logger.info("## ServantLocator #" +id + " .deactivate() ##");
 	}
 }
