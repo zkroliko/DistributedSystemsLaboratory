@@ -22,6 +22,7 @@ module Airfield
 		Airship occupant;		
 		string getCode();		
 		int getLoad();
+		void setLoad(int load);
 	};
 	
 	sequence<Runway*> Runways;	

@@ -37,7 +37,7 @@ public class Server
 			
 		    UserManagementI umServant1 = new UserManagementI(adapter);		    
 
-			Ice.ServantLocator windLocator= new ServantLocator1("locator1");
+			Ice.ServantLocator windLocator= new AirportInfoServantLocator("locator1");
 			adapter.addServantLocator(windLocator, "runway");
 					    
 			// 4. Dodanie wpisów do ASM

@@ -75,10 +75,19 @@ public class Client
 						String code = airport.getCode();
 						System.out.println("Aiport code is " + code);
 					}
-					if (line.equals("airportLoad"))
+					if (line.equals("getLoad"))
 					{
 						int load = airport.getLoad();
 						System.out.println("Aiport load is " + load);
+					}
+					if (line.contains("setLoad"))
+					{
+						String [] split = line.split(" ");
+						if (split.length > 1) {
+							airport.setLoad(Integer.parseInt(split[1]));
+						} else {
+							System.err.println("Incorrect input");
+						}
 					}
 					if(line.equals("add2 1"))
 					{

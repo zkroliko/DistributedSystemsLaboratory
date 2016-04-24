@@ -10,22 +10,22 @@ import Demo.*;
 
 
 
-public class ServantLocator1 implements Ice.ServantLocator
+public class AirportInfoServantLocator implements Ice.ServantLocator
 {
 	private String id = null;
 	private Object servant = null;
 	
-	public ServantLocator1(String id)
+	public AirportInfoServantLocator(String id)
 	{
 		this.id = id;
-		System.out.println("## ServantLocator1(" + id + ") ##");
+		System.out.println("## AirportInfoServantLocator(" + id + ") ##");
 	}
 
-	public ServantLocator1(String id, Ice.Object servant)
+	public AirportInfoServantLocator(String id, Ice.Object servant)
 	{
 		this.id = id;
 		this.servant = servant;
-		System.out.println("## ServantLocator1(" + id + ", obj) ##");
+		System.out.println("## AirportInfoServantLocator(" + id + ", obj) ##");
 	}
 
 	public Object locate(Current curr, LocalObjectHolder cookie) throws UserException 
@@ -37,13 +37,7 @@ public class ServantLocator1 implements Ice.ServantLocator
 	    if (servant == null) { // We don't have a servant already
 	 
 	        // Instantiate a servant
-	        //
-//	        ServantDetails d;
-//	        try {
-//	            d = DB.lookup(curr.id.name);
-//	        } catch (DB.error&) {
-//	            return null;
-//	        }
+	    	
 	        servant = new AirportInfoI();
 	 
 	        // Add the servant to the ASM.
@@ -51,14 +45,14 @@ public class ServantLocator1 implements Ice.ServantLocator
 	        curr.adapter.add(servant, curr.id);
 	    }
 	    
-		System.out.println("## ServantLocator1 #" +id + " .locate() ##");
+		System.out.println("## AirportInfoServantLocator #" +id + " .locate() ##");
 		
 		return servant;
 	}
 
 	public void finished(Ice.Current curr, Ice.Object servant, java.lang.Object cookie) throws UserException 
 	{
-		System.out.println("## ServantLocator1 #" +id + " .finished() ##");
+		System.out.println("## AirportInfoServantLocator #" +id + " .finished() ##");
 	}
 
 	public void deactivate(String category)

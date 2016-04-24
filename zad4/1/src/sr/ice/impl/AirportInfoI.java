@@ -14,9 +14,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
+import java.io.PrintWriter;
 import java.util.logging.Logger;
 
 import Airfield.AirportInfo;
@@ -28,11 +26,11 @@ public class AirportInfoI extends AirportInfo
 
 	private static final long serialVersionUID = -2448962912780867770L;
     //private WorkQueue _workQueue;
-	private final String csvFile = "runways.csv";
+	private final String csvFile = "airportInfo.csv";
 	
 	private String code;
 	
-	private int length;
+	private int load;
 	    
     public AirportInfoI()
     {
@@ -43,7 +41,7 @@ public class AirportInfoI extends AirportInfo
         		String[] lineStr = line.split(" ");
         		if (lineStr.length > 1) {
             		code = lineStr[0];
-            		length = Integer.parseInt(lineStr[1]);
+            		load = Integer.parseInt(lineStr[1]);
         		}
         	}
         } catch (IOException e) {
@@ -53,16 +51,29 @@ public class AirportInfoI extends AirportInfo
 
 	@Override
 	public String getCode(Current __current) {
-		// TODO Auto-generated method stub
 		return code;
 	}
 
 	@Override
 	public int getLoad(Current __current) {
-		// TODO Auto-generated method stub
-		return length;
+		return load;
 	}
 
+	@Override
+	public void setLoad(int load, Current __current) {
+		this.load = load; 
+		save();
+	}	
 	
+	private void save() {
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(csvFile, false));
+			writer.write(String.format("%s %s", code, load));
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
 
