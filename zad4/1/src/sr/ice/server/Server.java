@@ -10,7 +10,9 @@
 package sr.ice.server;
 
 
+import Adder.AdderInterface;
 import Ice.Identity;
+import sr.ice.impl.AdderI;
 
 public class Server
 {
@@ -39,6 +41,9 @@ public class Server
 			
 			Ice.ServantLocator addPoolLocator = new AddPoolServantLocator("add pool locator", 100);
 			adapter.addServantLocator(addPoolLocator, "adderpool");
+			
+			AdderInterface adderDefault = new AdderI(250);
+			adapter.addDefaultServant(adderDefault, "adderDefault");			
 					    
 
 	        // 5. Aktywacja adaptera i przejœcie w pêtlê przetwarzania ¿¹dañ
