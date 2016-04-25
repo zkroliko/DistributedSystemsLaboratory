@@ -12,7 +12,9 @@ package sr.ice.server;
 
 import Adder.AdderInterface;
 import Ice.Identity;
+import Pi.PiCalculator;
 import sr.ice.impl.AdderI;
+import sr.ice.impl.PiI;
 
 public class Server
 {
@@ -39,11 +41,11 @@ public class Server
 			Ice.ServantLocator addLocator = new AddServantLocator("add locator");
 			adapter.addServantLocator(addLocator, "adder");
 			
-			Ice.ServantLocator addPoolLocator = new AddPoolServantLocator("add pool locator", 100);
+			Ice.ServantLocator addPoolLocator = new AddPoolServantLocator("addpool locator", 100);
 			adapter.addServantLocator(addPoolLocator, "adderpool");
 			
-			AdderInterface adderDefault = new AdderI(250);
-			adapter.addDefaultServant(adderDefault, "adderDefault");			
+			PiCalculator piDefault = new PiI();
+			adapter.addDefaultServant(piDefault, "piDefault");			
 					    
 
 	        // 5. Aktywacja adaptera i przejœcie w pêtlê przetwarzania ¿¹dañ

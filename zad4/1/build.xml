@@ -17,7 +17,7 @@
     <!-- import common definitions -->
     <import file="${top.dir}/config/common.xml"/>
 
-    <target name="generate" depends="init">
+    <target name="generate">
         <!-- Create the output directory for generated code -->
         <mkdir dir="${generated.dir}"/>
         <slice2java outputdir="${generated.dir}">

@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import Adder.AdderInterface;
-import Demo.*;
 
 
 public class AddServantLocator implements Ice.ServantLocator
@@ -32,7 +31,7 @@ public class AddServantLocator implements Ice.ServantLocator
 		
 		return adder;
 	}
-
+ 
 	public void finished(Ice.Current curr, Ice.Object servant, java.lang.Object cookie) throws UserException 
 	{
 		logger.entering(this.getClass().getName(), "finished");

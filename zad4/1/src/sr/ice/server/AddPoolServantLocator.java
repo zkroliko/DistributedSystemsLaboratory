@@ -5,6 +5,7 @@ import Ice.LocalObjectHolder;
 import Ice.Object;
 import Ice.UserException;
 import sr.ice.impl.AdderI;
+import sr.ice.impl.AdderSlowI;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,14 +17,14 @@ public class AddPoolServantLocator implements Ice.ServantLocator
 {
 	private static final Logger logger = Logger.getLogger(AddPoolServantLocator.class.getName());
 	private String id = null;
-	private LRUCache cache = new LRUCache(100);
+	private LRUCache cache = new LRUCache(10);
 	
 	public AddPoolServantLocator(String id, int n)
 	{
 		this.id = id;
 		// Creating servant instances
 		for (int i = 0; i < n; i++) {
-			cache.set(i, new AdderI());
+			cache.set(i, new AdderSlowI());
 		}
 	}
 

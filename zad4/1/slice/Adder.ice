@@ -1,5 +1,5 @@
-#ifndef SR_DEMO_ICE
-#define SR_DEMO_ICE
+#ifndef ADDER
+#define ADDER
 
 module Adder
 {	

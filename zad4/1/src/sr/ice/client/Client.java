@@ -15,8 +15,9 @@ import Adder.AdderInterfacePrx;
 import Adder.AdderInterfacePrxHelper;
 import Airfield.AirportInfoPrx;
 import Airfield.AirportInfoPrxHelper;
-import Demo.*;
 import Ice.AsyncResult;
+import Pi.PiCalculatorPrx;
+import Pi.PiCalculatorPrxHelper;
 
 public class Client 
 {
@@ -36,7 +37,7 @@ public class Client
 			Ice.ObjectPrx airportProxy = communicator.stringToProxy("airportInfo/airport:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");			
 			Ice.ObjectPrx addProxy = communicator.stringToProxy("adder/add:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");
 			Ice.ObjectPrx addPoolProxy = communicator.stringToProxy("adderpool/addpool:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");
-			Ice.ObjectPrx addDeafultProxy = communicator.stringToProxy("adderDefault/addDefault:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");
+			Ice.ObjectPrx piDefaultProxy = communicator.stringToProxy("piDefault/piDefault:tcp -h localhost -p 10000:udp -h localhost -p 10000:ssl -h localhost -p 10001");
 
 			// 3. Rzutowanie, zawê¿anie
 			
@@ -51,8 +52,8 @@ public class Client
 			AdderInterfacePrx addpool = AdderInterfacePrxHelper.checkedCast(addPoolProxy);
 			if (addpool == null) throw new Error("Invalid addPool proxy");			
 
-			AdderInterfacePrx addDefault = AdderInterfacePrxHelper.checkedCast(addDeafultProxy);
-			if (addDefault == null) throw new Error("Invalid addDefault proxy");		
+			PiCalculatorPrx piDefault = PiCalculatorPrxHelper.checkedCast(piDefaultProxy);
+			if (piDefault == null) throw new Error("Invalid piDefault proxy");		
 
 			// 4. Wywolanie zdalnych operacji
 
@@ -115,13 +116,12 @@ public class Client
 							logger.warning("Incorrect input");
 						}
 					}
-					else if (line.startsWith("defaultadd")) {
+					else if (line.startsWith("pi")) {
 						String[] arguments = line.split(" ");
-						if (arguments.length > 2) {
+						if (arguments.length > 1) {
 							int a = Integer.parseInt(arguments[1]);
-							int b = Integer.parseInt(arguments[2]);
-							int result = addDefault.add(a, b);
-							logger.info("Result of addition with default servant: " + result);
+							int result = piDefault.getDigit(a);
+							logger.info("Pi digit: " + (char)result);
 						} else {
 							logger.warning("Incorrect input");
 						}

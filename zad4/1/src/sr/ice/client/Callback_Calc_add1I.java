@@ -1,4 +1,4 @@
-package sr.ice.client;
+/*package sr.ice.client;
 
 import Demo.Callback_Calc_add1;
 import Ice.LocalException;
@@ -18,3 +18,4 @@ public class Callback_Calc_add1I extends Callback_Calc_add1
 		System.out.println("EXCEPTION: " + __ex);
 	}
 }
+*/

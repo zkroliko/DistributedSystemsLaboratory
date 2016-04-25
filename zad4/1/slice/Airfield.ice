@@ -1,6 +1,6 @@
 
-#ifndef SR_DEMO_ICE
-#define SR_DEMO_ICE
+#ifndef AIRFIELD
+#define AIRFIELD
 
 //#include <Ice/BuiltinSequences.ice> 
 
