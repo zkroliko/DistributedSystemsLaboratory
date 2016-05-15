@@ -60,7 +60,7 @@ public class ChatClient {
     public ChatClient(String nickname, int channelNumber) {
         nick = nickname;
 
-        management = new ManagementChannel();
+        management = new ManagementChannel(channels);
         try {
             management.connect();
         } catch (Exception e) {
