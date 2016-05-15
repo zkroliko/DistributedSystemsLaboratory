@@ -1,5 +1,5 @@
 //chat.proto
-option java_package = "pl.edu.agh.dsrg.sr.chat.protos.2_6_1";
+option java_package = "pl.edu.agh.dsrg.sr.chat.protos";
 option java_outer_classname = "ChatOperationProtos";
 
 // wiadomosc przesylana na kanale "ChatManagement321123"
