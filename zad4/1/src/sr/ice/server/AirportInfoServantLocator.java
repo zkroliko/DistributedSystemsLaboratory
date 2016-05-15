@@ -32,18 +32,15 @@ public class AirportInfoServantLocator implements Ice.ServantLocator
 	{
 	    // Check if we have instantiated a servant already.
 	    //
-	    Ice.Object servant = curr.adapter.find(curr.id);
-	 
-	    if (servant == null) { // We don't have a servant already
-	 
-	        // Instantiate a servant
-	    	
-	        servant = new AirportInfoI();
-	 
-	        // Add the servant to the ASM.
-	        //
-	        curr.adapter.add(servant, curr.id);
-	    }
+	 	 
+        // Instantiate a servant
+    	
+        servant = new AirportInfoI();
+ 
+        // Add the servant to the ASM.
+        //
+        curr.adapter.add(servant, curr.id);
+
 	    
 	    logger.info("## AirportInfoServantLocator #" +id + " .locate() ##");
 		

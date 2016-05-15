@@ -10,9 +10,6 @@ module Airfield
 	{
 	};
 	
-	class Airship;
-	class Passenger;
-	class Travel;
 			
 	class AirportInfo
 	{
