@@ -17,7 +17,8 @@ public abstract class Channel {
     public Channel(String name) {
         this.name = name;
         try {
-            channel = new JChannel();
+            channel = new JChannel(false);
+            channel.setName(name);
             channel.setProtocolStack(stack(udp()));
         } catch (Exception e) {
             e.printStackTrace();

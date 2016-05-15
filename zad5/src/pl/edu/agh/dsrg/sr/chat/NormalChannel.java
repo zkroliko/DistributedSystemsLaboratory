@@ -19,22 +19,24 @@ public class NormalChannel extends Channel {
 
     private String channelName;
 
-    public List<String> users;
+    private String ownName;
+
+    public List<String> users = new LinkedList<>();
 
     private ManagementChannel management;
 
     public NormalChannel(String nickname, String number, ManagementChannel management) {
         super(number);
+        ownName = nickname;
         this.management = management;
         channelName = String.format(NAME_FORMAT,number);
         setUpReceiver();
         try {
-            management.sendJoin(nickname, channelName);
+            management.sendJoin(ownName, channelName);
         } catch (Exception e) {
             System.err.println("Joining channel failed: " + channelName);
             e.printStackTrace();
         }
-        users = new LinkedList<>();
     }
 
     private void setUpReceiver() {
@@ -44,6 +46,9 @@ public class NormalChannel extends Channel {
             }
             public void receive(Message msg) {
                 try {
+                    if (!ownName.equals(msg.getSrc().toString())) {
+                        ChatOperationProtos.ChatAction.parseFrom(msg.getBuffer());
+                    }
                     ChatOperationProtos.ChatAction.parseFrom(msg.getBuffer());
                 } catch (InvalidProtocolBufferException e) {
                     System.err.println("Invalid message received");

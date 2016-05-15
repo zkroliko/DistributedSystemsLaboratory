@@ -1,11 +1,14 @@
 package pl.edu.agh.dsrg.sr.chat;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.jgroups.JChannel;
+import org.jgroups.Message;
+import org.jgroups.ReceiverAdapter;
+import org.jgroups.View;
+import pl.edu.agh.dsrg.sr.chat.protos.ChatOperationProtos;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatClient {
 
@@ -42,7 +45,7 @@ public class ChatClient {
 
     private String nick;
 
-    private List<NormalChannel> channels;
+    private Map<Integer, NormalChannel> channels = new ConcurrentHashMap<>();
 
     private  ManagementChannel management;
 
@@ -55,8 +58,6 @@ public class ChatClient {
     }
 
     public ChatClient(String nickname, int channelNumber) {
-        channels = new LinkedList<>();
-
         nick = nickname;
 
         management = new ManagementChannel();
@@ -97,9 +98,16 @@ public class ChatClient {
                 listChannels();
             } else if (line.startsWith(MSG_COMMAND) && fields.length == 3) {
                 try {
-                    sendMsg(Integer.parseInt(fields[1]), fields[2]);
+                    int channelNumber = Integer.parseInt(fields[1]);
+                    if (legalChannel(channelNumber)) {
+                        sendMsg(Integer.parseInt(fields[1]), fields[2]);
+                    } else {
+                        throw new NumberFormatException(BAD_CHANNEL_MESSAGE);
+                    }
                 } catch (NumberFormatException e) {
                     System.err.println(BAD_USE_MESSAGE);
+                } catch (Exception e) {
+                    System.err.println("Error in sending message");
                 }
             } else {
                 System.err.println(BAD_USE_MESSAGE);
@@ -108,14 +116,14 @@ public class ChatClient {
         }
     }
 
-    private void sendMsg(int channelNumber, String message) {
-
+    private void sendMsg(int channelNumber, String message) throws Exception {
+        channels.get(channelNumber).sendMessage(message);
     }
 
     private void joinChannel(int channelNumber) {
         System.out.println(CHANNEL_HAVE_MESSAGE + channelNumber);
         NormalChannel channel = new NormalChannel(nick, String.valueOf(channelNumber), management);
-        channels.add(channel);
+        channels.put(channelNumber,channel);
         try {
             channel.connect();
         } catch (Exception e) {
@@ -131,12 +139,12 @@ public class ChatClient {
     }
 
     private void listChannels() {
-        for (NormalChannel channel : channels) {
+        for (NormalChannel channel : channels.values()) {
             System.out.print(channel.name+": ");
             for (String nick : channel.users) {
                 System.out.print(nick+", ");
             }
-            System.out.println(Arrays.toString(Character.toChars(8))+" ");
+            System.out.println("");
         }
     }
 
