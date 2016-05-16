@@ -7,10 +7,13 @@ import org.jgroups.View;
 import org.jgroups.protocols.UDP;
 import org.jgroups.stack.Protocol;
 import pl.edu.agh.dsrg.sr.chat.protos.ChatOperationProtos;
+import pl.edu.agh.dsrg.sr.chat.protos.ChatOperationProtos.ChatState;
 
 import java.io.OutputStream;
 import java.net.UnknownHostException;
 import java.util.Map;
+
+import static pl.edu.agh.dsrg.sr.chat.protos.ChatOperationProtos.*;
 
 public class ManagementChannel extends Channel {
 
@@ -18,9 +21,9 @@ public class ManagementChannel extends Channel {
 
     private Map<Integer, CommChannel> channels;
 
-    private ChatClient client;
+    private ChannelManager client;
 
-    public ManagementChannel(String ownName, ChatClient client) {
+    public ManagementChannel(String ownName, ChannelManager client) {
         super(NAME, ownName);
         buildChannel();
         this.channels = client.getChannels();
@@ -36,18 +39,18 @@ public class ManagementChannel extends Channel {
     }
 
     public void sendJoin(String channelName) throws Exception {
-        ChatOperationProtos.ChatAction action;
-        action = ChatOperationProtos.ChatAction.newBuilder().
-                setAction(ChatOperationProtos.ChatAction.ActionType.JOIN).
+        ChatAction action;
+        action = ChatAction.newBuilder().
+                setAction(ChatAction.ActionType.JOIN).
                 setChannel(channelName).
                 setNickname(ownName).build();
         channel.send(new Message(null, null, action.toByteArray()));
     }
 
     public void sendLeave(String channelName) throws Exception {
-        ChatOperationProtos.ChatAction action;
-        action = ChatOperationProtos.ChatAction.newBuilder().
-                setAction(ChatOperationProtos.ChatAction.ActionType.LEAVE).
+        ChatAction action;
+        action = ChatAction.newBuilder().
+                setAction(ChatAction.ActionType.LEAVE).
                 setChannel(channelName).
                 setNickname(ownName).build();
         channel.send(new Message(null, null, action.toByteArray()));
@@ -58,29 +61,37 @@ public class ManagementChannel extends Channel {
 
             @Override
             public void getState(OutputStream output) throws Exception {
-                ChatOperationProtos.ChatState.Builder builder = ChatOperationProtos.ChatState.newBuilder();
+                ChatState.Builder builder = ChatState.newBuilder();
                 for (CommChannel channel : channels.values()) {
-                    for (String user : channel.users)
-                    builder.addStateBuilder().setAction(ChatOperationProtos.ChatAction.ActionType.JOIN).
-                            setChannel(channel.name).setNickname(user);
+                    buildFromChannel(builder,channel);
                 }
-                ChatOperationProtos.ChatState state = builder.build();
-                state.writeTo(output);
+                builder.build().writeTo(output);
+            }
+
+            private void buildFromChannel(ChatState.Builder builder, CommChannel channel) {
+                for (String user : channel.users) {
+                    buildFromUser(builder,user);
+                }
+            }
+
+            private void buildFromUser(ChatState.Builder builder, String user) {
+                builder.addStateBuilder().setAction(ChatAction.ActionType.JOIN).
+                        setChannel(channel.getName()).setNickname(user);
             }
 
             @Override
             public void setState(java.io.InputStream input) throws Exception {
                 System.out.println("Synchronizing new client");
 
-                ChatOperationProtos.ChatState state  = ChatOperationProtos.ChatState.parseFrom(input);
+                ChatState state  = ChatState.parseFrom(input);
 
-                for (ChatOperationProtos.ChatAction action : state.getStateList()) {
+                for (ChatAction action : state.getStateList()) {
                     updateChannelFromAction(action);
                 }
 
             }
 
-            private void updateChannelFromAction(ChatOperationProtos.ChatAction action) {
+            private void updateChannelFromAction(ChatAction action) {
                 String channel = action.getChannel();
                 String nick = action.getNickname();
 
@@ -90,14 +101,12 @@ public class ManagementChannel extends Channel {
                     client.joinChannel(channelNumber);
                 }
                 commChannel = channels.get(channelNumber);
-                if (action.getAction() == ChatOperationProtos.ChatAction.ActionType.JOIN) {
+                if (action.getAction() == ChatAction.ActionType.JOIN) {
                     if (!commChannel.users.contains(action.getNickname())) {
-                        System.out.println("Adding user" + action.getNickname());
                         commChannel.users.add(action.getNickname());
                     }
                 } else {
                     if (commChannel.users.contains(action.getNickname())) {
-                        System.out.println("Removing user" + action.getNickname());
                         commChannel.users.remove(action.getNickname());
                     }
                 }
@@ -106,9 +115,10 @@ public class ManagementChannel extends Channel {
             public void viewAccepted(View view) {
                 super.viewAccepted(view);
             }
+
             public void receive(Message msg) {
                     try {
-                        handleAction(ChatOperationProtos.ChatAction.parseFrom(msg.getBuffer()));
+                        updateChannelFromAction(ChatAction.parseFrom(msg.getBuffer()));
                     } catch (InvalidProtocolBufferException e) {
                         System.err.println("Invalid message received");
                         e.printStackTrace();
@@ -118,10 +128,6 @@ public class ManagementChannel extends Channel {
             private int retrieveNumber(String name) {
                 String[] split = name.split("\\.");
                 return Integer.parseInt(split[split.length-1]);
-            }
-
-            private void handleAction(ChatOperationProtos.ChatAction action) {
-                updateChannelFromAction(action);
             }
         });
     }

@@ -70,4 +70,16 @@ public abstract class Channel {
                 .addProtocol(new FLUSH());
         return stack;
     }
+
+    public JChannel getChannel() {
+        return channel;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getOwnName() {
+        return ownName;
+    }
 }

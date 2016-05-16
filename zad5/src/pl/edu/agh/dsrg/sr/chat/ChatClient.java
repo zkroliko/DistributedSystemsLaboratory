@@ -1,7 +1,6 @@
 package pl.edu.agh.dsrg.sr.chat;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatClient {
 
@@ -12,8 +11,6 @@ public class ChatClient {
     public static final String NICK_HAVE_MESSAGE = "Twój nick: ";
 
     public static final String NICK_ASK_MESSAGE = "Podaj nick";
-
-    public static final String CHANNEL_HAVE_MESSAGE = "Dołączasz do kanału: ";
 
     public static final String EXIT_MESSAGE = "Wyszedłeś z czatu";
 
@@ -37,41 +34,28 @@ public class ChatClient {
 
     public static final String BAD_USE_MESSAGE = "Wprowadzono błędne polecenie";
 
-
-    private String nick;
-
-    private Map<Integer, CommChannel> channels = new ConcurrentHashMap<>();
-
-    private  ManagementChannel management;
+    private ChannelManager manager;
 
     public ChatClient() {
-        new ChatClient(getNick());
+        this(getNick());
     }
 
     public ChatClient(String nickname) {
-        new ChatClient(nickname, getChannelNumber());
+        manager = new ChannelManager(nickname);
     }
 
     public ChatClient(String nickname, int channelNumber) {
-        nick = nickname;
+        this(nickname);
 
-        management = new ManagementChannel(nickname, this);
-        try {
-            management.connect();
-            management.synchronize();
-        } catch (Exception e) {
-            System.err.println("Connecting to management channel failed");
-            e.printStackTrace();
-        }
-
-        if (!legalChannel(channelNumber)) {
+        if (!ChannelManager.legalChannel(channelNumber)) {
             channelNumber = getChannelNumber();
         } else {
-            joinChannel(channelNumber);
+            manager.joinChannel(channelNumber);
         }
+    }
 
+    public void start() {
         interfaceLoop();
-
     }
 
     public void interfaceLoop() {
@@ -82,8 +66,8 @@ public class ChatClient {
             if (line.startsWith(JOIN_COMMAND) && fields.length == 2) {
                 try {
                     int channelNumber = Integer.parseInt(fields[1]);
-                    if (legalChannel(channelNumber)) {
-                        joinChannel(channelNumber);
+                    if (ChannelManager.legalChannel(channelNumber)) {
+                        manager.joinChannel(channelNumber);
                     } else {
                         throw new NumberFormatException(BAD_CHANNEL_MESSAGE);
                     }
@@ -91,12 +75,12 @@ public class ChatClient {
                     System.err.println(e.getMessage());
                 }
             } else if (line.startsWith(LIST_COMMAND) && fields.length == 1) {
-                listChannels();
+                printChannels();
             } else if (line.startsWith(MSG_COMMAND) && fields.length == 3) {
                 try {
                     int channelNumber = Integer.parseInt(fields[1]);
-                    if (legalChannel(channelNumber)) {
-                        sendMsg(Integer.parseInt(fields[1]), fields[2]);
+                    if (ChannelManager.legalChannel(channelNumber)) {
+                        manager.sendChatMsg(Integer.parseInt(fields[1]), fields[2]);
                     } else {
                         throw new NumberFormatException(BAD_CHANNEL_MESSAGE);
                     }
@@ -113,7 +97,7 @@ public class ChatClient {
         System.out.println(EXIT_MESSAGE);
         // Closing all the channels
         try {
-            leaveChannels();
+            manager.leaveChannels();
         } catch (Exception e) {
             System.err.println("Error leaving the channel");
             e.printStackTrace();
@@ -121,84 +105,38 @@ public class ChatClient {
         System.exit(0);
     }
 
-    private void sendMsg(int channelNumber, String message) throws Exception {
-        channels.get(channelNumber).sendMessage(message);
+    private void printChannels() {
+        System.out.println(manager.getChannelPrintout());
     }
 
-    public void joinChannel(int channelNumber) {
-        System.out.println(CHANNEL_HAVE_MESSAGE + channelNumber);
-        CommChannel channel = new CommChannel(nick, String.valueOf(channelNumber), management);
-        channels.put(channelNumber,channel);
-        try {
-            channel.connect();
-        } catch (Exception e) {
-            System.err.println("Error connecting to channel: " + channelNumber);
-            e.printStackTrace();
-        }
-    }
-
-    private String getNick() {
+    private static String getNick() {
         Scanner s = new Scanner(System.in);
         System.out.println(NICK_ASK_MESSAGE);
         return s.nextLine();
     }
 
-    private void listChannels() {
-        for (CommChannel channel : channels.values()) {
-            System.out.print(channel.name+": ");
-            for (String nick : channel.users) {
-                System.out.print(nick+", ");
-            }
-            System.out.println("");
-        }
-    }
-
-    private void leaveChannels() throws Exception {
-        for (CommChannel channel : channels.values()) {
-            leaveChannel(channel);
-        }
-    }
-
-    private void leaveChannel(CommChannel channel) throws Exception {
-        channel.disconnect();
-        channel.close();
-        management.sendLeave(channel.name);
-    }
-
-    private int getChannelNumber() {
+    private static int getChannelNumber() {
         Scanner s = new Scanner(System.in);
         int channel = -1;
-        while (!legalChannel(channel)) {
+        while (!ChannelManager.legalChannel(channel)) {
             channel = readChannel(s);
         }
         return channel;
     }
 
-    private int readChannel(Scanner s) {
+    private static int readChannel(Scanner s) {
         int channel;
         System.out.println(CHANNEL_MESSAGE);
         channel = s.nextInt();
-        if (!legalChannel(channel)) {
+        if (!ChannelManager.legalChannel(channel)) {
             System.out.println(BAD_CHANNEL_MESSAGE);
         }
         return channel;
     }
 
-    public boolean legalChannel(int channel) {
-        return channel >= MIN_CHANNEL && channel <= MAX_CHANNEL;
-    }
-
-    public Map<Integer, CommChannel> getChannels() {
-        return channels;
-    }
-
-    public ManagementChannel getManagement() {
-        return management;
-    }
-
     public static void main(String[] args) {
 
-        ChatClient client;
+        ChatClient client = null;
 
         if (args.length == 0) {
             client = new ChatClient();
@@ -210,7 +148,8 @@ public class ChatClient {
         } else {
             System.err.println(RUN_HELP);
         }
-
-
+        if (client != null) {
+            client.start();
+        }
     }
 }
