@@ -14,24 +14,33 @@ public abstract class Channel {
 
     protected String name;
 
-    public Channel(String name) {
+    protected String ownName;
+
+    public Channel(String name, String ownName) {
         this.name = name;
+        this.ownName = ownName;
+    }
+
+    protected void buildChannel() {
         try {
             channel = new JChannel(false);
             channel.setName(name);
             channel.setProtocolStack(stack(udp()));
+            setUpReceiver();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setReceiver(ReceiverAdapter receiver) {
-        channel.setReceiver(receiver);
-    }
+    protected abstract void setUpReceiver();
 
     public void connect() throws Exception {
         channel.getProtocolStack().init();
-        channel.connect("ChatCluster");
+        channel.connect(name);
+    }
+
+    public void disconnect() throws Exception {
+        channel.disconnect();
     }
 
     public void close() throws Exception {

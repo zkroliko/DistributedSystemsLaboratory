@@ -1,12 +1,5 @@
 package pl.edu.agh.dsrg.sr.chat;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.jgroups.JChannel;
-import org.jgroups.Message;
-import org.jgroups.ReceiverAdapter;
-import org.jgroups.View;
-import pl.edu.agh.dsrg.sr.chat.protos.ChatOperationProtos;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,6 +14,8 @@ public class ChatClient {
     public static final String NICK_ASK_MESSAGE = "Podaj nick";
 
     public static final String CHANNEL_HAVE_MESSAGE = "Dołączasz do kanału: ";
+
+    public static final String EXIT_MESSAGE = "Wyszedłeś z czatu";
 
     public static final String CHANNEL_MESSAGE = "Podaj numer kanału pomiędzy " + MIN_CHANNEL + " a " + MAX_CHANNEL;
 
@@ -45,7 +40,7 @@ public class ChatClient {
 
     private String nick;
 
-    private Map<Integer, NormalChannel> channels = new ConcurrentHashMap<>();
+    private Map<Integer, CommChannel> channels = new ConcurrentHashMap<>();
 
     private  ManagementChannel management;
 
@@ -60,7 +55,7 @@ public class ChatClient {
     public ChatClient(String nickname, int channelNumber) {
         nick = nickname;
 
-        management = new ManagementChannel(channels);
+        management = new ManagementChannel(nickname, this);
         try {
             management.connect();
         } catch (Exception e) {
@@ -81,7 +76,7 @@ public class ChatClient {
     public void interfaceLoop() {
         Scanner s = new Scanner(System.in);
         String line = s.nextLine();
-        while (!line.toLowerCase().contains("exit")) {
+        while (!(line.toLowerCase().startsWith("exit"))) {
             String[] fields = line.split(" ");
             if (line.startsWith(JOIN_COMMAND) && fields.length == 2) {
                 try {
@@ -114,15 +109,24 @@ public class ChatClient {
             }
             line = s.nextLine();
         }
+        System.out.println(EXIT_MESSAGE);
+        // Closing all the channels
+        try {
+            leaveChannels();
+        } catch (Exception e) {
+            System.err.println("Error leaving the channel");
+            e.printStackTrace();
+        }
+        System.exit(0);
     }
 
     private void sendMsg(int channelNumber, String message) throws Exception {
         channels.get(channelNumber).sendMessage(message);
     }
 
-    private void joinChannel(int channelNumber) {
+    public void joinChannel(int channelNumber) {
         System.out.println(CHANNEL_HAVE_MESSAGE + channelNumber);
-        NormalChannel channel = new NormalChannel(nick, String.valueOf(channelNumber), management);
+        CommChannel channel = new CommChannel(nick, String.valueOf(channelNumber), management);
         channels.put(channelNumber,channel);
         try {
             channel.connect();
@@ -139,13 +143,25 @@ public class ChatClient {
     }
 
     private void listChannels() {
-        for (NormalChannel channel : channels.values()) {
+        for (CommChannel channel : channels.values()) {
             System.out.print(channel.name+": ");
             for (String nick : channel.users) {
                 System.out.print(nick+", ");
             }
             System.out.println("");
         }
+    }
+
+    private void leaveChannels() throws Exception {
+        for (CommChannel channel : channels.values()) {
+            leaveChannel(channel);
+        }
+    }
+
+    private void leaveChannel(CommChannel channel) throws Exception {
+        channel.disconnect();
+        channel.close();
+        management.sendLeave(channel.name);
     }
 
     private int getChannelNumber() {
@@ -169,6 +185,14 @@ public class ChatClient {
 
     public boolean legalChannel(int channel) {
         return channel >= MIN_CHANNEL && channel <= MAX_CHANNEL;
+    }
+
+    public Map<Integer, CommChannel> getChannels() {
+        return channels;
+    }
+
+    public ManagementChannel getManagement() {
+        return management;
     }
 
     public static void main(String[] args) {

@@ -13,43 +13,38 @@ import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NormalChannel extends Channel {
+public class CommChannel extends Channel {
 
     public static final String NAME_FORMAT = "230.0.0.%s";
 
     private String channelName;
 
-    private String ownName;
-
     public List<String> users = new LinkedList<>();
 
     private ManagementChannel management;
 
-    public NormalChannel(String nickname, String number, ManagementChannel management) {
-        super(number);
-        ownName = nickname;
+    public CommChannel(String nickname, String number, ManagementChannel management) {
+        super(number, nickname);
         this.management = management;
         channelName = String.format(NAME_FORMAT,number);
-        setUpReceiver();
+        buildChannel();
         try {
-            management.sendJoin(ownName, channelName);
+            management.sendJoin(channelName);
         } catch (Exception e) {
             System.err.println("Joining channel failed: " + channelName);
             e.printStackTrace();
         }
     }
 
-    private void setUpReceiver() {
+    protected void setUpReceiver() {
         channel.setReceiver(new ReceiverAdapter() {
             public void viewAccepted(View view) {
                 super.viewAccepted(view);
             }
             public void receive(Message msg) {
                 try {
-                    if (!ownName.equals(msg.getSrc().toString())) {
-                        ChatOperationProtos.ChatAction.parseFrom(msg.getBuffer());
-                    }
-                    ChatOperationProtos.ChatAction.parseFrom(msg.getBuffer());
+                    ChatOperationProtos.ChatMessage action = ChatOperationProtos.ChatMessage.parseFrom(msg.getBuffer());
+                    System.out.println(String.format("%s: %s", msg.getSrc(), action.getMessage()));
                 } catch (InvalidProtocolBufferException e) {
                     System.err.println("Invalid message received");
                     e.printStackTrace();
@@ -57,7 +52,6 @@ public class NormalChannel extends Channel {
             }
         });
     }
-
 
     public void sendMessage(String message) throws Exception {
         ChatOperationProtos.ChatMessage chatMessage;
@@ -70,9 +64,6 @@ public class NormalChannel extends Channel {
         UDP udp = new UDP();
         udp.setValue("mcast_group_addr", InetAddress.getByName(channelName));
         udp.setValue("mcast_port", 6789);
-        System.out.println(udp.getValue("mcast_group_addr"));
-        System.out.println(InetAddress.getByName(channelName));
-
         return udp;
     }
 }
