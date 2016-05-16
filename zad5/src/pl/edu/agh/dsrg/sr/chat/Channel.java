@@ -24,7 +24,7 @@ public abstract class Channel {
     protected void buildChannel() {
         try {
             channel = new JChannel(false);
-            channel.setName(name);
+            channel.setName(ownName);
             channel.setProtocolStack(stack(udp()));
             setUpReceiver();
         } catch (Exception e) {

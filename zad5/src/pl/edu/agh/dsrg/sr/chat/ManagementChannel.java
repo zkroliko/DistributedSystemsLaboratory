@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
+import org.jgroups.demos.Chat;
 import org.jgroups.protocols.UDP;
 import org.jgroups.stack.Protocol;
 import pl.edu.agh.dsrg.sr.chat.protos.ChatOperationProtos;
@@ -26,6 +27,14 @@ public class ManagementChannel extends Channel {
         buildChannel();
         this.channels = client.getChannels();
         this.client = client;
+    }
+
+    public void synchronize() {
+        try {
+            channel.getState(null,10000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendJoin(String channelName) throws Exception {
@@ -51,22 +60,46 @@ public class ManagementChannel extends Channel {
 
             @Override
             public void getState(OutputStream output) throws Exception {
-                System.out.println("Synchronizing new client");
-                for (CommChannel c : channels.values()) {
-                    List<String> users = c.users;
-                    for (String user : users) {
-                        ChatOperationProtos.ChatAction action;
-                        action = ChatOperationProtos.ChatAction.newBuilder().
-                                setAction(ChatOperationProtos.ChatAction.ActionType.JOIN).
-                                setChannel(c.name).setNickname(user).build();
-                        channel.send(new Message(null, null, action.toByteArray()));
-                    }
+                ChatOperationProtos.ChatState.Builder builder = ChatOperationProtos.ChatState.newBuilder();
+                for (CommChannel channel : channels.values()) {
+                    for (String user : channel.users)
+                    builder.addStateBuilder().setAction(ChatOperationProtos.ChatAction.ActionType.JOIN).
+                            setChannel(channel.name).setNickname(user);
                 }
+                ChatOperationProtos.ChatState state = builder.build();
+                state.writeTo(output);
             }
 
             @Override
             public void setState(java.io.InputStream input) throws Exception {
-                System.out.println("State synchronized");
+                System.out.println("Synchronizing new client");
+
+                ChatOperationProtos.ChatState state  = ChatOperationProtos.ChatState.parseFrom(input);
+
+                for (ChatOperationProtos.ChatAction action : state.getStateList()) {
+                    String channel = action.getChannel();
+                    String nick = action.getNickname();
+
+                    int channelNumber = retrieveNumber(action.getChannel());
+                    CommChannel commChannel;
+                    if (!channels.containsKey(channelNumber)) {
+                        client.joinChannel(channelNumber);
+                    }
+                    commChannel = channels.get(channelNumber);
+                    if (action.getAction() == ChatOperationProtos.ChatAction.ActionType.JOIN) {
+                        if (!commChannel.users.contains(action.getNickname())) {
+                            System.out.println("Adding user" + action.getNickname());
+                            commChannel.users.add(action.getNickname());
+                        }
+                    } else {
+                        if (commChannel.users.contains(action.getNickname())) {
+                            System.out.println("Removing user" + action.getNickname());
+                            commChannel.users.remove(action.getNickname());
+                        }
+                    }
+
+                }
+
             }
 
             public void viewAccepted(View view) {

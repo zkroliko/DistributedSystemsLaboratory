@@ -58,6 +58,7 @@ public class ChatClient {
         management = new ManagementChannel(nickname, this);
         try {
             management.connect();
+            management.synchronize();
         } catch (Exception e) {
             System.err.println("Connecting to management channel failed");
             e.printStackTrace();

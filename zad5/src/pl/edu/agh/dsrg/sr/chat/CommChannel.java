@@ -44,7 +44,10 @@ public class CommChannel extends Channel {
             public void receive(Message msg) {
                 try {
                     ChatOperationProtos.ChatMessage action = ChatOperationProtos.ChatMessage.parseFrom(msg.getBuffer());
-                    System.out.println(String.format("%s: %s", msg.getSrc(), action.getMessage()));
+                    Address address = msg.getSrc();
+                    if (!address.toString().equals(ownName)) {
+                        System.out.println(String.format("%s: %s", address, action.getMessage()));
+                    }
                 } catch (InvalidProtocolBufferException e) {
                     System.err.println("Invalid message received");
                     e.printStackTrace();
