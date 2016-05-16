@@ -17,8 +17,6 @@ public class CommChannel extends Channel {
 
     public static final String NAME_FORMAT = "230.0.0.%s";
 
-    private String channelName;
-
     public List<String> users = new LinkedList<>();
 
     private ManagementChannel management;
@@ -26,12 +24,12 @@ public class CommChannel extends Channel {
     public CommChannel(String nickname, String number, ManagementChannel management) {
         super(number, nickname);
         this.management = management;
-        channelName = String.format(NAME_FORMAT,number);
+        name = String.format(NAME_FORMAT,number);
         buildChannel();
         try {
-            management.sendJoin(channelName);
+            management.sendJoin(name);
         } catch (Exception e) {
-            System.err.println("Joining channel failed: " + channelName);
+            System.err.println("Joining channel failed: " + name);
             e.printStackTrace();
         }
     }
@@ -65,8 +63,8 @@ public class CommChannel extends Channel {
 
     protected Protocol udp() throws UnknownHostException {
         UDP udp = new UDP();
-        udp.setValue("mcast_group_addr", InetAddress.getByName(channelName));
-        udp.setValue("mcast_port", 6789);
+        udp.setValue("mcast_group_addr", InetAddress.getByName(name));
+        System.out.println(udp.getValue("mcast_group_addr"));
         return udp;
     }
 }

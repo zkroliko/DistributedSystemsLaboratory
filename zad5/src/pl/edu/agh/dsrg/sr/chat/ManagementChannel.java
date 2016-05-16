@@ -4,14 +4,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
-import org.jgroups.demos.Chat;
 import org.jgroups.protocols.UDP;
 import org.jgroups.stack.Protocol;
 import pl.edu.agh.dsrg.sr.chat.protos.ChatOperationProtos;
 
 import java.io.OutputStream;
 import java.net.UnknownHostException;
-import java.util.List;
 import java.util.Map;
 
 public class ManagementChannel extends Channel {
@@ -77,29 +75,32 @@ public class ManagementChannel extends Channel {
                 ChatOperationProtos.ChatState state  = ChatOperationProtos.ChatState.parseFrom(input);
 
                 for (ChatOperationProtos.ChatAction action : state.getStateList()) {
-                    String channel = action.getChannel();
-                    String nick = action.getNickname();
-
-                    int channelNumber = retrieveNumber(action.getChannel());
-                    CommChannel commChannel;
-                    if (!channels.containsKey(channelNumber)) {
-                        client.joinChannel(channelNumber);
-                    }
-                    commChannel = channels.get(channelNumber);
-                    if (action.getAction() == ChatOperationProtos.ChatAction.ActionType.JOIN) {
-                        if (!commChannel.users.contains(action.getNickname())) {
-                            System.out.println("Adding user" + action.getNickname());
-                            commChannel.users.add(action.getNickname());
-                        }
-                    } else {
-                        if (commChannel.users.contains(action.getNickname())) {
-                            System.out.println("Removing user" + action.getNickname());
-                            commChannel.users.remove(action.getNickname());
-                        }
-                    }
-
+                    updateChannelFromAction(action);
                 }
 
+            }
+
+            private void updateChannelFromAction(ChatOperationProtos.ChatAction action) {
+                String channel = action.getChannel();
+                String nick = action.getNickname();
+
+                int channelNumber = retrieveNumber(action.getChannel());
+                CommChannel commChannel;
+                if (!channels.containsKey(channelNumber)) {
+                    client.joinChannel(channelNumber);
+                }
+                commChannel = channels.get(channelNumber);
+                if (action.getAction() == ChatOperationProtos.ChatAction.ActionType.JOIN) {
+                    if (!commChannel.users.contains(action.getNickname())) {
+                        System.out.println("Adding user" + action.getNickname());
+                        commChannel.users.add(action.getNickname());
+                    }
+                } else {
+                    if (commChannel.users.contains(action.getNickname())) {
+                        System.out.println("Removing user" + action.getNickname());
+                        commChannel.users.remove(action.getNickname());
+                    }
+                }
             }
 
             public void viewAccepted(View view) {
@@ -120,23 +121,7 @@ public class ManagementChannel extends Channel {
             }
 
             private void handleAction(ChatOperationProtos.ChatAction action) {
-                int channelNumber = retrieveNumber(action.getChannel());
-                CommChannel channel;
-                if (!channels.containsKey(channelNumber)) {
-                    client.joinChannel(channelNumber);
-                }
-                channel = channels.get(channelNumber);
-                if (action.getAction() == ChatOperationProtos.ChatAction.ActionType.JOIN) {
-                    if (!channel.users.contains(action.getNickname())) {
-                        System.out.println("Adding user" + action.getNickname());
-                        channel.users.add(action.getNickname());
-                    }
-                } else {
-                    if (channel.users.contains(action.getNickname())) {
-                        System.out.println("Removing user" + action.getNickname());
-                        channel.users.remove(action.getNickname());
-                    }
-                }
+                updateChannelFromAction(action);
             }
         });
     }
