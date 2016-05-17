@@ -76,11 +76,12 @@ public class ChatClient {
                 }
             } else if (line.startsWith(LIST_COMMAND) && fields.length == 1) {
                 printChannels();
-            } else if (line.startsWith(MSG_COMMAND) && fields.length == 3) {
+            } else if (line.startsWith(MSG_COMMAND) && fields.length >= 3) {
                 try {
                     int channelNumber = Integer.parseInt(fields[1]);
+                    String message = line.substring(line.indexOf(fields[1]));
                     if (ChannelManager.legalChannel(channelNumber)) {
-                        manager.sendChatMsg(Integer.parseInt(fields[1]), fields[2]);
+                        manager.sendChatMsg(Integer.parseInt(fields[1]), message );
                     } else {
                         throw new NumberFormatException(BAD_CHANNEL_MESSAGE);
                     }

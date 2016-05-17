@@ -93,21 +93,26 @@ public class ManagementChannel extends Channel {
 
             private void updateChannelFromAction(ChatAction action) {
                 String channel = action.getChannel();
-                String nick = action.getNickname();
 
-                int channelNumber = retrieveNumber(channel);
-                CommChannel commChannel;
-                if (!channels.containsKey(channelNumber)) {
-                    client.addChannel(channelNumber);
-                }
-                commChannel = channels.get(channelNumber);
-                if (action.getAction() == ChatAction.ActionType.JOIN) {
-                    if (!commChannel.users.contains(action.getNickname())) {
-                        commChannel.users.add(action.getNickname());
+                if (!channel.equals(NAME)) {
+                    int channelNumber = Integer.parseInt(channel);
+                    // For safety
+                    if (channel.startsWith("230.")) {
+                        return;
                     }
-                } else {
-                    if (commChannel.users.contains(action.getNickname())) {
-                        commChannel.users.remove(action.getNickname());
+                    CommChannel commChannel;
+                    if (!channels.containsKey(channelNumber)) {
+                        client.addChannel(channelNumber);
+                    }
+                    commChannel = channels.get(channelNumber);
+                    if (action.getAction() == ChatAction.ActionType.JOIN) {
+                        if (!commChannel.users.contains(action.getNickname())) {
+                            commChannel.users.add(action.getNickname());
+                        }
+                    } else {
+                        if (commChannel.users.contains(action.getNickname())) {
+                            commChannel.users.remove(action.getNickname());
+                        }
                     }
                 }
             }

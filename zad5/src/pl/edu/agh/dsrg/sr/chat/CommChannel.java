@@ -23,10 +23,13 @@ public class CommChannel extends Channel {
 
     private boolean isMember = false;
 
+    private String address;
+
     public CommChannel(String nickname, String number, ManagementChannel management) {
         super(number, nickname);
         this.management = management;
-        name = String.format(NAME_FORMAT,number);
+        name = number;
+        address = String.format(NAME_FORMAT,number);
         buildChannel();
     }
 
@@ -69,7 +72,7 @@ public class CommChannel extends Channel {
 
     protected Protocol udp() throws UnknownHostException {
         UDP udp = new UDP();
-        udp.setValue("mcast_group_addr", InetAddress.getByName(name));
+        udp.setValue("mcast_group_addr", InetAddress.getByName(address));
         return udp;
     }
 

@@ -38,13 +38,15 @@ public class ChannelManager {
     }
 
     public void addChannel(int channelNumber) {
-        CommChannel channel = new CommChannel(localName, String.valueOf(channelNumber), management);
-        channels.put(channelNumber,channel);
-        try {
-            channels.get(channelNumber).connect();
-        } catch (Exception e) {
-            System.err.println("Error connecting to channel: " + channelNumber);
-            e.printStackTrace();
+        if (!channels.containsKey(channelNumber)) {
+            CommChannel channel = new CommChannel(localName, String.valueOf(channelNumber), management);
+            channels.put(channelNumber, channel);
+            try {
+                channels.get(channelNumber).connect();
+            } catch (Exception e) {
+                System.err.println("Error connecting to channel: " + channelNumber);
+                e.printStackTrace();
+            }
         }
     }
 
