@@ -21,13 +21,19 @@ public class CommChannel extends Channel {
 
     private ManagementChannel management;
 
+    private boolean isMember = false;
+
     public CommChannel(String nickname, String number, ManagementChannel management) {
         super(number, nickname);
         this.management = management;
         name = String.format(NAME_FORMAT,number);
         buildChannel();
+    }
+
+    public void join() {
         try {
             management.sendJoin(name);
+            isMember = true;
         } catch (Exception e) {
             System.err.println("Joining channel failed: " + name);
             e.printStackTrace();
@@ -43,7 +49,7 @@ public class CommChannel extends Channel {
                 try {
                     ChatOperationProtos.ChatMessage action = ChatOperationProtos.ChatMessage.parseFrom(msg.getBuffer());
                     Address address = msg.getSrc();
-                    if (!address.toString().equals(ownName)) {
+                    if (isMember && !address.toString().equals(ownName)) {
                         System.out.println(String.format("%s: %s", address, action.getMessage()));
                     }
                 } catch (InvalidProtocolBufferException e) {
@@ -64,7 +70,10 @@ public class CommChannel extends Channel {
     protected Protocol udp() throws UnknownHostException {
         UDP udp = new UDP();
         udp.setValue("mcast_group_addr", InetAddress.getByName(name));
-        System.out.println(udp.getValue("mcast_group_addr"));
         return udp;
+    }
+
+    public List<String> getUsers() {
+        return users;
     }
 }

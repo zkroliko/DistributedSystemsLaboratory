@@ -68,15 +68,15 @@ public class ManagementChannel extends Channel {
                 builder.build().writeTo(output);
             }
 
-            private void buildFromChannel(ChatState.Builder builder, CommChannel channel) {
-                for (String user : channel.users) {
-                    buildFromUser(builder,user);
+            private void buildFromChannel(ChatState.Builder builder, CommChannel commChannel) {
+                for (String user : commChannel.users) {
+                    buildFromUser(builder,user, commChannel);
                 }
             }
 
-            private void buildFromUser(ChatState.Builder builder, String user) {
+            private void buildFromUser(ChatState.Builder builder, String user, CommChannel commChannel) {
                 builder.addStateBuilder().setAction(ChatAction.ActionType.JOIN).
-                        setChannel(channel.getName()).setNickname(user);
+                        setChannel(commChannel.getName()).setNickname(user);
             }
 
             @Override
@@ -95,10 +95,10 @@ public class ManagementChannel extends Channel {
                 String channel = action.getChannel();
                 String nick = action.getNickname();
 
-                int channelNumber = retrieveNumber(action.getChannel());
+                int channelNumber = retrieveNumber(channel);
                 CommChannel commChannel;
                 if (!channels.containsKey(channelNumber)) {
-                    client.joinChannel(channelNumber);
+                    client.addChannel(channelNumber);
                 }
                 commChannel = channels.get(channelNumber);
                 if (action.getAction() == ChatAction.ActionType.JOIN) {
@@ -134,7 +134,6 @@ public class ManagementChannel extends Channel {
 
     protected Protocol udp() throws UnknownHostException {
         UDP udp = new UDP();
-        udp.setValue("mcast_port", 6789);
         return udp;
     }
 

@@ -37,12 +37,23 @@ public class ChannelManager {
         channels.get(channelNumber).sendMessage(message);
     }
 
-    public void joinChannel(int channelNumber) {
-        System.out.println(CHANNEL_HAVE_MESSAGE + channelNumber);
+    public void addChannel(int channelNumber) {
         CommChannel channel = new CommChannel(localName, String.valueOf(channelNumber), management);
         channels.put(channelNumber,channel);
         try {
-            channel.connect();
+            channels.get(channelNumber).connect();
+        } catch (Exception e) {
+            System.err.println("Error connecting to channel: " + channelNumber);
+            e.printStackTrace();
+        }
+    }
+
+    public void joinChannel(int channelNumber) {
+        System.out.println(CHANNEL_HAVE_MESSAGE + channelNumber);
+        addChannel(channelNumber);
+        try {
+            channels.get(channelNumber).join();
+            channels.get(channelNumber).connect();
         } catch (Exception e) {
             System.err.println("Error connecting to channel: " + channelNumber);
             e.printStackTrace();
